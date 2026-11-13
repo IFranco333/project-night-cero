@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Core/NightCero.Core.csproj" />
+    <ProjectReference Include="../../src/Runner/NightCero.Runner.csproj" />
     <ProjectReference Include="../../src/Ai/NightCero.Ai.csproj" />
     <ProjectReference Include="../../src/Content/NightCero.Content.csproj" />
     <ProjectReference Include="../../src/Save/NightCero.Save.csproj" />
