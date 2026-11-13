@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>NightCero.Save</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Core/NightCero.Core.csproj" />
+    <ProjectReference Include="../Content/NightCero.Content.csproj" />
+  </ItemGroup>
+</Project>

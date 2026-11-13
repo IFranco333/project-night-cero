@@ -1,0 +1,53 @@
+# Roadmap — Noche Cero (vertical slice)
+
+Sprint role: each sprint produces a demonstrable milestone and a retro in `docs/sprints/sprint-N.md`.
+Definition of Done: tests green + CI green + demo runs + retro written.
+
+## S0 — Foundations
+Goal: solution builds, deterministic core skeleton tested, Godot opens a scene.
+- Solution: `Core`, `Ai`, `Content`, `Save`, `Game`, `tests` + xUnit + CI (dotnet test, format, Godot headless build)
+- ECS (entities, components, systems, deferred commands, event bus)
+- Deterministic RNG with named streams + golden tests
+- 3D world model: chunks, transforms, collision primitives
+- Headless sim runner + state hash/replay
+- Godot scene: ground, instanced boxes, third-person camera, WASD movement demo
+- "Noche Cero" title screen
+- ADRs 0001–0003 accepted
+
+## S1 — World, navigation, opening
+- Town generator (roads, buildings with interiors, props) from seed
+- Content system + schema validation
+- Nav graph per level + A* with corner-safe smoothing
+- Camera visibility, explored-map fog
+- Noche Cero opening scene (wake in bed)
+- Invariant tests: streets connected, buildings reachable, golden hashes per seed
+
+## S2 — Player, equipment, combat
+- Player controller: third-person movement, first-person aim toggle
+- Survival stats: hunger, thirst, stamina, wounds (cuts/fractures), bleeding, splints
+- Inventory (weight, stacking, equip), loot containers, food heals
+- Weapons: melee (axe/sword/bat/pipe), bow with arrow recovery, firearms by tier
+- HUD and minimal menus
+
+## S3 — Threats and stealth
+- Zombie AI: perception, investigate/chase/attack, horde alerting
+- Hostile community AI: patrols, cover, flanking, traps, ambush, retreat, reinforcements, shared memory
+- Stealth: crouch, noise, cover, darkness
+- Catacomb (3 levels) with ghost and darkness
+- Balance simulation reports
+
+## S4 — Vehicles, progression, atmosphere
+- One drivable car (fuel, battery, collision, damage)
+- XP/skills (aim, stealth, survival, strength); day counter
+- Day/night cycle and ambience
+- Hospital interior + medical loot; hostile district layout
+- Win/lose flow and first full night
+
+## S5 — Persistence & hardening
+- Save/load versioned + migrations + checksum
+- Save fuzzing, schema validation, threat model
+- Determinism replay harness, performance budgets
+- README with GIF, CHANGELOG, release `v1.0.0`
+
+## Post-slice (vision backlog)
+2–3 km² regions, several communities and reputation, vampires, more vehicles, crafting, full skill tree, FPS-only mode. See `docs/vision.md`.

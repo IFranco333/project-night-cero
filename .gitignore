@@ -1,0 +1,29 @@
+# ---- .NET ----
+bin/
+obj/
+*.user
+*.suo
+.vs/
+coverage/
+TestResults/
+*.Coverage.xml
+
+# ---- Godot ----
+.godot/
+export.cfg
+*.translation
+
+# ---- Runtime ----
+saves/*.json
+!saves/.gitkeep
+
+# ---- OS / editor ----
+.env
+.env.*
+!.env.example
+*.local
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+dist/
