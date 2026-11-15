@@ -1,5 +1,6 @@
 using System.Globalization;
 using NightCero.Core.Ecs;
+using NightCero.Core.Player;
 
 namespace NightCero.Core.Simulation;
 
@@ -25,12 +26,37 @@ public sealed record SimulationCheckpoint(
 public sealed class Simulation
 {
     /// <summary>Length of one gameplay tick.</summary>
-    public static readonly TimeSpan TickDuration = TimeSpan.FromMilliseconds(100);
+    public static TimeSpan TickDuration => SimulationClock.TickDuration;
 
     public Simulation(ulong seed) => World = new World(seed);
 
     /// <summary>The low-level entity–component world. Systems live here.</summary>
     public World World { get; }
+
+    /// <summary>The entity the presentation layer follows and controls, if any.</summary>
+    public Entity Player { get; private set; }
+
+    /// <summary>
+    /// Declares the player entity. Presentation follows it; <see cref="Submit(MoveIntent)"/>
+    /// targets it.
+    /// </summary>
+    public void BindPlayer(Entity player) => Player = player;
+
+    /// <summary>Applies a movement intent to the player for the next tick.</summary>
+    public void Submit(MoveIntent intent)
+    {
+        ArgumentNullException.ThrowIfNull(intent);
+        if (Player.IsNone)
+        {
+            throw new InvalidOperationException("No player is bound; call BindPlayer first.");
+        }
+
+        World.Set(Player, new PlayerMoveState(intent.Direction, intent.Sprint));
+        LastIntent = intent;
+    }
+
+    /// <summary>The last movement intent submitted, for replay logs and the headless runner.</summary>
+    public MoveIntent? LastIntent { get; private set; }
 
     /// <summary>The world seed.</summary>
     public ulong Seed => World.Seed;

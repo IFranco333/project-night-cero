@@ -1,6 +1,6 @@
 <div align="center">
 
-[![CI](https://github.com/IFranco333/noche-cero/actions/workflows/ci.yml/badge.svg)](https://github.com/IFranco333/noche-cero/actions/workflows/ci.yml)
+[![CI](https://github.com/IFranco333/project-night-cero/actions/workflows/ci.yml/badge.svg)](https://github.com/IFranco333/project-night-cero/actions/workflows/ci.yml)
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![Godot](https://img.shields.io/badge/Godot-4.x%20(.NET)-478CBF)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
@@ -88,7 +88,7 @@ The full long-term scope — larger regions, more communities, new threats, craf
 
 ## Current status
 
-> **Foundation stage (S0).** The repository currently contains the product and architecture documentation, the engineering process and a compiling solution skeleton. **There is no playable build yet.** Gameplay systems are being implemented milestone by milestone, starting with the ECS, the deterministic RNG, the headless runner and the Godot scene shell.
+> **Foundation stage (S0).** The engine-free core is in place: a deterministic fixed-tick loop, an entity–component world with deferred structural changes, seeded RNG with golden tests, a state hash, a headless CLI runner, player movement and third-person camera math. **There is no playable build yet** — the Godot scene shell is the remaining S0 item and needs the Godot .NET editor.
 
 The project is developed in the open, with every feature shipped together with its tests and documentation.
 
@@ -140,6 +140,8 @@ Project-NightCero.sln
 │   ├── Ai/         Shared perception and planning — no Godot
 │   ├── Content/    Data-driven game definitions — no Godot
 │   ├── Save/       Versioned serialization and migrations — no Godot
+│   ├── Camera/     Third-person camera math — no Godot
+│   ├── Runner/     Headless CLI: run a seed, print the state hash
 │   └── Game/       Godot project: scenes, camera, input, UI, rendering
 ├── tests/
 │   └── Project-NightCero.Tests/   xUnit test suite for the simulation
@@ -186,10 +188,22 @@ On every push and pull request, CI runs the Godot-free guard on the core project
 ### Quick start
 
 ```bash
-git clone https://github.com/IFranco333/noche-cero.git
-cd noche-cero
+git clone https://github.com/IFranco333/project-night-cero.git
+cd project-night-cero
 dotnet test Project-NightCero.sln    # build the simulation and run its test suite
 ```
+
+Run the deterministic headless simulation (no engine required):
+
+```bash
+dotnet run --project src/Runner -- --seed 2026 --ticks 250 --bodies 8
+# seed     2026
+# ticks    250
+# entities 8
+# hash     696c8fbb980683a3
+```
+
+The same seed and tick count always print the same hash — that is the determinism guarantee in action.
 
 To run the game once the Godot project lands (milestone S0), open `src/Game/project.godot` with the Godot 4 **.NET** editor.
 
@@ -222,7 +236,7 @@ The Godot project lives in `src/Game/` and is added in milestone S0. Until then 
 
 | Milestone | Goal | Status |
 |---|---|---|
-| **S0 — Foundations** | Solution, ECS, deterministic RNG, headless runner, Godot scene shell, "Noche Cero" title screen | ⬜ planned |
+| **S0 — Foundations** | Solution, ECS, deterministic RNG, headless runner, player movement, camera math, Godot scene shell, "Noche Cero" title screen | 🟡 in progress (engine-free core done; Godot shell pending) |
 | **S1 — World, navigation, opening** | Town generator, nav graph, visibility, opening scene | ⬜ planned |
 | **S2 — Player, equipment, combat** | Movement, cameras, survival stats, injuries, weapons, inventory, HUD | ⬜ planned |
 | **S3 — Threats and stealth** | Zombie AI, hostile community AI, stealth, catacomb | ⬜ planned |

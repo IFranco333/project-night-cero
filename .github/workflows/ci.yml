@@ -10,11 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Core, Ai, Content and Save must not reference Godot (ADR 0002)
+      - name: Engine-free projects must not reference Godot (ADR 0002)
         shell: bash
         run: |
-          for p in src/Core src/Ai src/Content src/Save; do
-            if grep -rn "Godot" "$p" --include="*.cs" --include="*.csproj"; then
+          # Match real references (using directives, the GodotSharp package, the Godot SDK),
+          # not the word "Godot" in prose comments.
+          pattern='using[[:space:]]+Godot|GodotSharp|Godot\.NET\.Sdk'
+          for p in src/Core src/Ai src/Content src/Save src/Camera src/Runner; do
+            if grep -rnE "$pattern" "$p" --include="*.cs" --include="*.csproj"; then
               echo "::error::Godot reference found in $p"
               exit 1
             fi

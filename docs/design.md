@@ -1,6 +1,6 @@
 # Design — Noche Cero (vertical slice)
 
-Living design document. Gameplay constants live in `src/core/balance.ts` (or `Core/Balance.cs`) and are mirrored here in the same commit. Full-game north star: `docs/vision.md`.
+Living design document. Gameplay constants live in the engine-free core (for example `src/Core/Player/MoveIntent.cs`) and are mirrored here in the same commit. Full-game north star: `docs/vision.md`.
 
 ## One-liner
 *Noche Cero*: you wake up to the screams of your city on the night the apocalypse begins. Survive the infected, the darkness underneath, and the people who locked themselves in.
@@ -18,6 +18,8 @@ This is a **scripted intro that hands control back quickly**: pick up the flashl
 
 ## Camera
 Third-person by default (behind-the-shoulder, character visible). Hold aim → smooth transition to first-person aim with weapon model. Free orbit on mouse, zoom wheel. Aim in first person is the only time the player sees their weapon up close.
+
+The orbit math is implemented engine-free in `src/Camera/ThirdPersonRig.cs`: yaw 0 faces north (−Z), yaw grows clockwise seen from above, pitch is clamped to [−30°, 70°], and the orbit radius is measured from the head point so pitch never changes the distance. The Godot layer only applies the resulting pose to a `Camera3D`.
 
 ## Core loop (slice)
 Wake up in your house → gear up (flashlight, weapon) → explore the town and loot (food, meds, ammo, arrows) → manage hunger/thirst/stamina/wounds → avoid or fight hordes alerted by noise → recover medical supplies at the hospital → optionally raid the hostile community district → find the catacomb entrance → recover the objective → reach the safehouse and survive the night.

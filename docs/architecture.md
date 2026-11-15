@@ -20,7 +20,7 @@ The game state is a **3D world simulated headlessly**. Godot renders it and turn
        |   Ai     |  |  Content  |  |   Save   |
        +----------+  +-----------+  +----------+
 ```
-- `Core`, `Ai`, `Content`, `Save` are **plain .NET projects** (target `net8.0`, no Godot references).
+- `Core`, `Ai`, `Content`, `Save`, `Camera` and `Runner` are **plain .NET projects** (target `net8.0`, no Godot references).
 - `Game` is the only project referencing GodotSharp; it depends on Core.
 - CI verifies the golden rule above.
 
@@ -28,14 +28,20 @@ The game state is a **3D world simulated headlessly**. Godot renders it and turn
 ```
 Project-NightCero.sln
 src/
-  Core/       Core.csproj        deterministic simulation (ECS, chunks, RNG, systems, balance)
-  Ai/         Ai.csproj          perception and planning shared by every agent
-  Content/    Content.csproj     data-driven definitions (items, loot, weapons, factions, injuries)
-  Save/       Save.csproj        serialization, versioning, migrations, validation
-  Game/       NightCero.Game.csproj  Godot project glue (C#), scenes under Game/
+  Core/       NightCero.Core.csproj    deterministic simulation (ECS, chunks, RNG, systems, balance)
+  Ai/         NightCero.Ai.csproj      perception and planning shared by every agent
+  Content/    NightCero.Content.csproj data-driven definitions (items, loot, weapons, factions, injuries)
+  Save/       NightCero.Save.csproj    serialization, versioning, migrations, validation
+  Camera/     NightCero.Camera.csproj  third-person camera math (pure, engine-free)
+  Runner/     NightCero.Runner.csproj  headless CLI: run a seed, print the state hash
+  Game/       NightCero.Game.csproj    Godot project glue (C#), scenes under Game/ — not in the .sln
 tests/
-  Project-NightCero.Tests/       xUnit tests for Core/Ai/Content/Save
+  Project-NightCero.Tests/             xUnit tests for every engine-free project
 ```
+
+`NightCero.Game` is deliberately excluded from the solution: it targets the Godot SDK, which
+needs a Godot project directory to generate its glue, so keeping it out lets `dotnet build` and
+`dotnet test` run on any machine with only the .NET SDK.
 
 ## World and coordinates
 - Right-handed 3D: X east, Y up, Z south (Godot convention). Units: metres.
@@ -68,4 +74,17 @@ tests/
 - One directional light with shadow range limited around the camera; night lighting presets.
 
 ## Headless mode
-A console entry point in `Core` (or a `dotnet run` harness) boots the simulation without Godot for tests, replay and balance statistics.
+`NightCero.Runner` is a console harness that boots the simulation without Godot:
+
+```bash
+dotnet run --project src/Runner -- --seed 2026 --ticks 250 --bodies 8 [--state]
+```
+
+It prints the seed, tick count, entity count and the `StateHasher` hash (and, with `--state`, the
+canonical state text). The same seed and tick count always print the same hash — the determinism
+guarantee made checkable from a shell and in CI.
+
+## Presentation math
+`NightCero.Camera` holds the third-person rig as pure math (`ThirdPersonRig.Evaluate` →
+`CameraPose`), with no Godot types. The Godot layer feeds it the player transform and mouse yaw/pitch
+and applies the resulting pose to a `Camera3D`, so camera behaviour is unit-tested like the sim.

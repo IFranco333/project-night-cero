@@ -5,14 +5,18 @@ Definition of Done: tests green + CI green + demo runs + retro written.
 
 ## S0 — Foundations
 Goal: solution builds, deterministic core skeleton tested, Godot opens a scene.
-- Solution: `Core`, `Ai`, `Content`, `Save`, `Game`, `tests` + xUnit + CI (dotnet test, format, Godot headless build)
-- ECS (entities, components, systems, deferred commands, event bus)
-- Deterministic RNG with named streams + golden tests
-- 3D world model: chunks, transforms, collision primitives
-- Headless sim runner + state hash/replay
-- Godot scene: ground, instanced boxes, third-person camera, WASD movement demo
-- "Noche Cero" title screen
-- ADRs 0001–0003 accepted
+- [x] Solution: `Core`, `Ai`, `Content`, `Save`, `Camera`, `Runner`, `tests` + xUnit + CI (dotnet test, format)
+- [x] ECS (entities, components, systems, deferred commands, event bus)
+- [x] Deterministic RNG with named streams + golden tests
+- [x] 3D world model: chunks, transforms
+- [x] Headless sim runner + state hash
+- [x] Player movement system (intent → transform) and third-person camera math
+- [ ] Godot scene: ground, instanced boxes, third-person camera, WASD movement demo
+- [ ] "Noche Cero" title screen
+- [ ] Godot headless build job in CI
+- [x] ADRs 0001–0003 accepted
+
+Status detail and lessons: [`docs/sprints/sprint-0.md`](sprints/sprint-0.md).
 
 ## S1 — World, navigation, opening
 - Town generator (roads, buildings with interiors, props) from seed
