@@ -84,6 +84,13 @@ It prints the seed, tick count, entity count and the `StateHasher` hash (and, wi
 canonical state text). The same seed and tick count always print the same hash — the determinism
 guarantee made checkable from a shell and in CI.
 
+`--bench` measures tick throughput. Timing lives in the runner, never in the deterministic core, so
+the printed hash still proves the run is reproducible.
+
+Replays use `InputLog` (Core): a recorded intent per tick. `Simulation.Run(InputLog)` replays it
+tick by tick, and with the same seed it reaches the same state hash — the property `ReplayTests`
+pins down.
+
 ## Presentation math
 `NightCero.Camera` holds the third-person rig as pure math (`ThirdPersonRig.Evaluate` →
 `CameraPose`), with no Godot types. The Godot layer feeds it the player transform and mouse yaw/pitch

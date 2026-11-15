@@ -205,6 +205,13 @@ dotnet run --project src/Runner -- --seed 2026 --ticks 250 --bodies 8
 
 The same seed and tick count always print the same hash — that is the determinism guarantee in action.
 
+Measure tick throughput (timing lives in the runner, not the deterministic core):
+
+```bash
+dotnet run --project src/Runner -- --seed 2026 --ticks 20000 --bodies 1000 --bench
+# ticks/s ~439, ms/tick ~2.28 on the development machine
+```
+
 To run the game once the Godot project lands (milestone S0), open `src/Game/project.godot` with the Godot 4 **.NET** editor.
 
 ### Prerequisites

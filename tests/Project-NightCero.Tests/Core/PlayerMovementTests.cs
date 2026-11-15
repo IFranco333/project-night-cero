@@ -1,7 +1,6 @@
 using NightCero.Core.Math;
 using NightCero.Core.Player;
 using NightCero.Core.Simulation;
-using NightCero.Core.WorldModel;
 using NightCero.Tests.Support;
 
 namespace NightCero.Tests.Core;
@@ -145,19 +144,5 @@ public sealed class PlayerMovementTests
         simulation.Run(1);
 
         Assert.Equal(Vec2.Forward, simulation.PlayerView().Movement.MoveDirection);
-    }
-
-    private static class PlayerScene
-    {
-        public static Simulation Create(ulong seed = 1)
-        {
-            var simulation = new Simulation(seed);
-            var player = simulation.World.Spawn(
-                new Transform(Vec3.Zero, 0),
-                new PlayerMoveState(Vec2.Zero, Sprinting: false));
-            simulation.BindPlayer(player);
-            simulation.World.AddSystem(new PlayerMovementSystem());
-            return simulation;
-        }
     }
 }

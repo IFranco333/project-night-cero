@@ -1,7 +1,10 @@
+using System.Diagnostics;
 using System.Globalization;
 using NightCero.Core.Ecs;
 using NightCero.Core.Math;
+using NightCero.Core.Player;
 using NightCero.Core.Simulation;
+using NightCero.Core.WorldModel;
 
 namespace NightCero.Runner;
 
@@ -24,6 +27,11 @@ public static class Program
             return 2;
         }
 
+        if (options.Bench)
+        {
+            return RunBenchmark(options);
+        }
+
         var simulation = new Simulation(options.Seed);
         SpawnDemoBodies(simulation.World, options.Bodies, options.Seed);
         simulation.Run(options.Ticks);
@@ -39,6 +47,49 @@ public static class Program
         }
 
         return 0;
+    }
+
+    /// <summary>
+    /// Measures steady-state tick throughput. Timing lives here, in the runner, never in the
+    /// deterministic core; the printed hash still proves the run is reproducible.
+    /// </summary>
+    private static int RunBenchmark(RunnerOptions options)
+    {
+        var simulation = new Simulation(options.Seed);
+        SpawnMovingBodies(simulation.World, options.Bodies);
+        simulation.World.AddSystem(new PlayerMovementSystem());
+
+        // Warm up the JIT so the measurement reflects steady-state work.
+        simulation.Run(Math.Min(10, options.Ticks));
+
+        var stopwatch = Stopwatch.StartNew();
+        simulation.Run(options.Ticks);
+        stopwatch.Stop();
+
+        var seconds = stopwatch.Elapsed.TotalSeconds;
+        var ticksPerSecond = seconds > 0 ? options.Ticks / seconds : double.PositiveInfinity;
+        var millisecondsPerTick = options.Ticks > 0 ? stopwatch.Elapsed.TotalMilliseconds / options.Ticks : 0;
+
+        Console.WriteLine($"seed     {simulation.Seed}");
+        Console.WriteLine($"ticks    {options.Ticks}");
+        Console.WriteLine($"entities {simulation.World.HighestEntityId}");
+        Console.WriteLine($"elapsed  {stopwatch.Elapsed.TotalMilliseconds:F1} ms");
+        Console.WriteLine($"ticks/s  {ticksPerSecond:F0}");
+        Console.WriteLine($"ms/tick  {millisecondsPerTick:F4}");
+        Console.WriteLine($"hash     {simulation.Checkpoint().Hash:x16}");
+        return 0;
+    }
+
+    /// <summary>Bodies with a transform and a movement intent, so the benchmark exercises the ECS.</summary>
+    private static void SpawnMovingBodies(World world, int count)
+    {
+        var rng = world.Rng.Fork("runner-bench");
+        for (var i = 0; i < count; i++)
+        {
+            var position = new Vec3(rng.NextInt(-16, 16), 0, rng.NextInt(-16, 16));
+            var direction = new Vec2(rng.NextInt(-10, 10) / 10f, rng.NextInt(-10, 10) / 10f);
+            world.Spawn(new Transform(position, 0), new PlayerMoveState(direction, Sprinting: false));
+        }
     }
 
     /// <summary>A small deterministic scene: bodies drifting east with per-entity speeds.</summary>
@@ -59,14 +110,15 @@ public static class Program
 }
 
 /// <summary>Parsed command-line options of the runner.</summary>
-public sealed record RunnerOptions(ulong Seed, int Ticks, int Bodies, bool ShowState)
+public sealed record RunnerOptions(ulong Seed, int Ticks, int Bodies, bool ShowState, bool Bench = false)
 {
     public const string Usage =
-        "usage: nightcero [--seed N] [--ticks N] [--bodies N] [--state]\n" +
+        "usage: nightcero [--seed N] [--ticks N] [--bodies N] [--state] [--bench]\n" +
         "  --seed     world seed (default 1)\n" +
         "  --ticks    simulation ticks to run, 100 ms each (default 100)\n" +
         "  --bodies   demo entities to spawn (default 4)\n" +
-        "  --state    print the canonical state after the run";
+        "  --state    print the canonical state after the run\n" +
+        "  --bench    measure tick throughput instead of printing the state";
 
     /// <summary>Parses the arguments, or returns null (and the caller prints the usage).</summary>
     public static RunnerOptions? Parse(string[] args)
@@ -75,6 +127,7 @@ public sealed record RunnerOptions(ulong Seed, int Ticks, int Bodies, bool ShowS
         var ticks = 100;
         var bodies = 4;
         var showState = false;
+        var bench = false;
 
         for (var i = 0; i < args.Length; i++)
         {
@@ -102,6 +155,9 @@ public sealed record RunnerOptions(ulong Seed, int Ticks, int Bodies, bool ShowS
                 case "--state":
                     showState = true;
                     break;
+                case "--bench":
+                    bench = true;
+                    break;
                 case "--help" or "-h":
                     return null;
                 default:
@@ -109,6 +165,6 @@ public sealed record RunnerOptions(ulong Seed, int Ticks, int Bodies, bool ShowS
             }
         }
 
-        return new RunnerOptions(seed, ticks, bodies, showState);
+        return new RunnerOptions(seed, ticks, bodies, showState, bench);
     }
 }

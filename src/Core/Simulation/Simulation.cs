@@ -74,6 +74,24 @@ public sealed class Simulation
         }
     }
 
+    /// <summary>
+    /// Replays a recorded input log, one tick per entry, submitting each intent before its tick.
+    /// The same seed and log always reach the same state (ADR 0002).
+    /// </summary>
+    public void Run(InputLog log)
+    {
+        ArgumentNullException.ThrowIfNull(log);
+        foreach (var intent in log.Entries)
+        {
+            if (intent is not null)
+            {
+                Submit(intent);
+            }
+
+            World.Tick();
+        }
+    }
+
     /// <summary>Hash of the current state.</summary>
     public ulong StateHash() => StateHasher.Hash(World);
 
