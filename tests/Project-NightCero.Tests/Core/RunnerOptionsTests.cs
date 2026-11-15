@@ -14,14 +14,25 @@ public sealed class RunnerOptionsTests
         Assert.Equal(100, options.Ticks);
         Assert.Equal(4, options.Bodies);
         Assert.False(options.ShowState);
+        Assert.False(options.Bench);
     }
 
     [Fact]
     public void AllOptionsAreParsed()
     {
-        var options = RunnerOptions.Parse(["--seed", "2026", "--ticks", "250", "--bodies", "8", "--state"]);
+        var options = RunnerOptions.Parse(["--seed", "2026", "--ticks", "250", "--bodies", "8", "--state", "--bench"]);
 
-        Assert.Equal(new RunnerOptions(2026, 250, 8, true), options);
+        Assert.Equal(new RunnerOptions(2026, 250, 8, true, true), options);
+    }
+
+    [Fact]
+    public void BenchFlagAloneIsParsed()
+    {
+        var options = RunnerOptions.Parse(["--bench"]);
+
+        Assert.NotNull(options);
+        Assert.True(options.Bench);
+        Assert.False(options.ShowState);
     }
 
     [Theory]

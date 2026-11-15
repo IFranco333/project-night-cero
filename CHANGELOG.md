@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed-tick `Simulation`, canonical `StateHasher` and a headless `NightCero.Runner` CLI.
 - Player movement system (walk 3.5 m/s, sprint 6.0 m/s) and engine-free third-person camera math
   (`NightCero.Camera`).
+- Deterministic replay: `InputLog` records one intent per tick and `Simulation.Run(InputLog)`
+  reproduces the session hash-for-hash.
+- `--bench` mode in the runner for tick-throughput measurements.
 - Sprint 0 retro in `docs/sprints/sprint-0.md`.
 
 ### Changed

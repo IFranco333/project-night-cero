@@ -36,6 +36,12 @@ editor installed.
 - `NightCero.Camera.ThirdPersonRig`: pure orbit math, pitch clamped to [−30°, 70°], radius measured
   from the head so pitch never changes the distance.
 
+### S0-5 — Deterministic replay and benchmark
+- `InputLog` records one intent per tick; `Simulation.Run(InputLog)` replays it. `ReplayTests`
+  proves that a recorded session and its replay reach the same state hash, and that a different
+  seed or a different log diverges.
+- `--bench` in the runner measures tick throughput (timing stays out of the deterministic core).
+
 ## Not delivered (needs Godot)
 - Godot scene shell: ground, instanced boxes, `Camera3D` driven by `ThirdPersonRig`, WASD demo.
 - "Noche Cero" title screen.
