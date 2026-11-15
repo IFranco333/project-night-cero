@@ -4,7 +4,7 @@
 - **Estado:** aceptada
 
 ## Contexto
-El proyecto es un RPG de supervivencia 3D nativo (descargable, sin navegador) con mundo, IA de zombis y humanos, armas, lesiones, vehículos y guardado. Se quiere un historial de Git limpio, código correcto y de calidad, y trade-offs bien razonados. El hardware de desarrollo inicial es modesto (Dell Latitude 5490, 16 GB; GPU dedicada GTX 1060 disponible más adelante).
+El proyecto es un RPG de supervivencia 3D nativo (descargable, sin navegador) con mundo, IA de zombis y humanos, armas, lesiones, vehículos y guardado. Se quiere un historial de Git limpio, código correcto y de calidad, y trade-offs bien razonados. El objetivo son equipos de gama media y modesta: el juego debe desarrollarse y correr en hardware de consumo sin GPU de gama alta.
 
 ## Decisión
 Usar **Godot 4.x (.NET) + C#**. Toda la lógica de juego vive en un proyecto de **clases C# puras** (`Core/`, `Ai/`, `Content/`, `Save/`) sin referencias a Godot, determinista y testeada con **xUnit**. Godot se usa solo como **capa de presentación y conexión** (`Game/`: escenas, nodos, cámara, input, UI).

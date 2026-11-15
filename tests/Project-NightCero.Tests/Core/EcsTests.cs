@@ -82,9 +82,12 @@ public sealed class EcsTests
     {
         var world = new World(1);
         var ids = Enumerable.Range(0, 64).Select(_ => world.Spawn()).ToArray();
-        foreach (var id in ids.Reverse())
+
+        // Walk ids backwards on purpose: insertion order must not affect iteration order. An
+        // explicit loop avoids the array.Reverse() overload ambiguity (LINQ vs. Span in-place).
+        for (var i = ids.Length - 1; i >= 0; i--)
         {
-            world.Set(id, new Position(id.Value, 0));
+            world.Set(ids[i], new Position(ids[i].Value, 0));
         }
         world.Despawn(ids[10]);
 

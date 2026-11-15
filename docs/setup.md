@@ -1,27 +1,44 @@
-# Setup notes — Noche Cero
+# Setup — Noche Cero
 
-Internal, machine-specific notes. Not part of the product documentation shown in the README.
+How to build, test and run the project on any development machine.
 
-## Developer machines
+## Prerequisites
 
-| Machine | Notes |
-|---|---|
-| Dell Latitude 5490 (16 GB RAM, Intel integrated graphics) | Primary start. Godot 4 must run with the **Compatibility** (OpenGL) renderer; expect slow editor performance and no heavy scenes. Good enough for Core work and light scenes. |
-| Desktop with NVIDIA GTX 1060 | Full Godot editing and play-testing of scenes with lighting. Primary machine once available. |
+| Tool | Version | Purpose |
+|---|---|---|
+| [.NET SDK](https://dotnet.microsoft.com/download) | 8.0 | Build and test the engine-free simulation |
+| [Godot](https://godotengine.org/download) | 4.x, **.NET edition** | Open and run the game layer |
 
-## Installing the toolchain (Windows, winget)
+## Install (Windows, winget)
 
 ```powershell
 winget install -e --id Microsoft.DotNet.SDK.8 --source winget
 winget install -e --id GodotEngine.GodotEngine.Mono --source winget
 ```
 
-## First run
+## Build and test
 
-1. `dotnet restore Project-NightCero.sln` then `dotnet test Project-NightCero.sln`.
-2. The first S0 story generates `src/Game/project.godot`; open it in the Godot .NET editor after that.
-3. In Project Settings → Rendering → Renderer, choose **Compatibility** on the Dell.
+```bash
+dotnet restore Project-NightCero.sln
+dotnet test Project-NightCero.sln --configuration Release
+dotnet format Project-NightCero.sln --verify-no-changes
+```
+
+## Run the headless simulation
+
+```bash
+dotnet run --project src/Runner -- --seed 2026 --ticks 250 --bodies 8
+```
+
+The command prints a state hash that is identical on every machine for the same seed — the
+determinism guarantee can be checked from a shell.
+
+## Game layer
+
+The Godot project lives in `src/Game/`. Once `project.godot` exists, open it with the Godot 4
+**.NET** editor. On limited graphics hardware, switch Project Settings → Rendering → Renderer to
+**Compatibility (OpenGL)**.
 
 ## Local secrets
 
-Local tool configuration is kept out of the repository. Never commit credentials or machine-specific settings files.
+Machine-specific settings and credentials stay out of the repository.
