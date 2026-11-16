@@ -19,12 +19,14 @@ Goal: solution builds, deterministic core skeleton tested, Godot opens a scene.
 Status detail and lessons: [`docs/sprints/sprint-0.md`](sprints/sprint-0.md).
 
 ## S1 — World, navigation, opening
-- Town generator (roads, buildings with interiors, props) from seed
-- Content system + schema validation
-- Nav graph per level + A* with corner-safe smoothing
-- Camera visibility, explored-map fog
-- Noche Cero opening scene (wake in bed)
-- Invariant tests: streets connected, buildings reachable, golden hashes per seed
+- [x] Town generator (roads, buildings with interiors, props) from seed
+- [x] Content: typed building catalog validated at boot (JSON modding later)
+- [x] Nav graph + A* with string-pulled smoothing
+- [x] Invariant tests: buildings never overlap, every door reachable, golden town hash per seed
+- [ ] Camera visibility, explored-map fog
+- [ ] Noche Cero opening scene (wake in bed) — needs the Godot editor
+
+Status detail and lessons: [`docs/sprints/sprint-1.md`](sprints/sprint-1.md).
 
 ## S2 — Player, equipment, combat
 - Player controller: third-person movement, first-person aim toggle

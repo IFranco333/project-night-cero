@@ -23,12 +23,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--bench` mode in the runner for tick-throughput measurements.
 - CI reports line coverage in the job summary; the README shows a coverage badge.
 - Sprint 0 retro in `docs/sprints/sprint-0.md`.
+- Town generation (`NightCero.Core.WorldGen`): seeded road grid, buildings with entrances and
+  interiors, and static props. `TownSpawner` adds them to the ECS, so the town is part of the state
+  hash; `TownPlan.Hash()` pins a whole town per seed.
+- Building catalog in `NightCero.Content`, validated at boot.
+- Navigation (`NightCero.Core.Navigation`): graph builder, A* with node-id tie-breaking and
+  string-pulled path smoothing against building footprints.
+- `Rect2` ground-plane geometry and a shared `Hashing.Fnv1a64`.
+- `StateHasher` now covers enums, booleans, strings and integer components.
+- Runner `--town` and `--nav` modes for inspecting a generated town and a route headlessly.
 
 ### Changed
 
 - Project named **Noche Cero**; stack defined as Godot 4 (.NET) with a deterministic, headless simulation core.
 - Solution file uses the classic `.sln` format; the locked .NET 8 SDK cannot load `.slnx`.
 - README documents the real project status per milestone (see the status table).
+- `InternalsVisibleTo` names the real test assembly, so tests can build small graphs and worlds.
 
 ## [0.0.0] - 2026-11-11
 

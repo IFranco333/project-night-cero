@@ -30,6 +30,17 @@ Wake up in your house → gear up (flashlight, weapon) → explore the town and 
 ## Time model
 1 tick = 100 ms simulation; day/night cycle of 20 real minutes. Night lowers visibility and activates the ghost and community aggression.
 
+## World generation
+The town is generated from the save seed, never hand-placed:
+
+- A 1024 × 1024 m rectangle of 16 × 16 blocks, separated by 8 m roads; each block holds up to four buildings.
+- About 10 % of blocks are parks and 6 % are empty lots; the rest are built.
+- The church and the hospital are unique: the generator gives each one to a landmark building, so a town has exactly one of each.
+- Every building has a door on the street side and an interior split into rooms; containers and loot spawn per room in S2.
+- Buildings never overlap, every door is reachable from the road graph, and the same seed always produces the same town (pinned by a golden hash in the tests).
+
+These numbers are defaults of `TownSettings` (`src/Core/WorldGen/TownSettings.cs`) and of `BuildingCatalog` (`src/Content/BuildingCatalog.cs`); changing them changes every generated town, so they are versioned with the save format.
+
 ## Balance table (initial — tune via the balance simulation)
 | Parameter | Value | Unit | Reason |
 |---|---|---|---|

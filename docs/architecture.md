@@ -49,6 +49,32 @@ needs a Godot project directory to generate its glue, so keeping it out lets `do
 - Navigation on a 2.5D height field with per-level nav graphs; catacomb levels connected by portals (stairs).
 - Static geometry generated from content + seed; Godot renders with MultiMesh instancing.
 
+## World generation
+`NightCero.Core.WorldGen` builds the static town from the seed, with no engine and no content dependency:
+- `TownSettings` describes the grid (block pitch, road width, building margin); the defaults are a
+  1024 × 1024 m town of 16 × 16 blocks.
+- `TownGenerator` fills each block with up to four buildings drawn from the `BuildingDefinition`
+  records it receives as a catalog. `NightCero.Content.BuildingCatalog` is the game's catalog; the
+  core only knows the shape, so a test can pass a hand-written one.
+- Every random draw comes from the named streams `town/blocks`, `town/buildings` and `town/props`,
+  and blocks are visited in row-major order, so the plan is reproducible (ADR 0002).
+- Each building gets an entrance on the wall facing the nearest street and an interior split into
+  rooms of roughly 9 m.
+- `TownPlan.CanonicalText()` and `Hash()` make a whole town comparable; the golden test pins the
+  town for seed 2026.
+- `TownSpawner` turns the plan into entities (`Transform` plus `BuildingTag` / `PropTag`), so the
+  static world is part of the state hash.
+
+## Navigation
+`NightCero.Core.Navigation` turns a plan into a weighted graph:
+- nodes at road crossings, points along the roads, one per building entrance and one per room;
+- `AStar.FindPath` uses Euclidean distance and breaks ties by node id, so the route is reproducible;
+- `PathSmoother` drops nodes that a clear straight line can skip, testing each shortcut with
+  `TownGeometry.IsSegmentClear` against the building footprints.
+
+Keeping routes as node ids rather than editor-placed markers is what makes chase and patrol
+behaviour testable when the agents arrive in S3.
+
 ## Tick and time
 - Fixed step 100 ms (10 Hz) for gameplay; render interpolates at display rate.
 - Fixed system order; structural changes (spawn/despawn/components) deferred to end of tick via command buffer.
@@ -83,6 +109,10 @@ dotnet run --project src/Runner -- --seed 2026 --ticks 250 --bodies 8 [--state]
 It prints the seed, tick count, entity count and the `StateHasher` hash (and, with `--state`, the
 canonical state text). The same seed and tick count always print the same hash — the determinism
 guarantee made checkable from a shell and in CI.
+
+`--town` generates the town for the seed and spawns it instead of demo bodies, printing the town
+hash; `--nav` also builds the navigation graph and reports a route between two building entrances.
+Both are headless and reproducible, so world generation is inspected without opening Godot.
 
 `--bench` measures tick throughput. Timing lives in the runner, never in the deterministic core, so
 the printed hash still proves the run is reproducible.
