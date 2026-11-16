@@ -1,5 +1,7 @@
 # Roadmap — Noche Cero (vertical slice)
 
+*Noche Cero* / *Night Zero* is a working title and may change; the roadmap keeps the current name until it does.
+
 Sprint role: each sprint produces a demonstrable milestone and a retro in `docs/sprints/sprint-N.md`.
 Definition of Done: tests green + CI green + demo runs + retro written.
 
@@ -37,6 +39,7 @@ Status detail and lessons: [`docs/sprints/sprint-1.md`](sprints/sprint-1.md).
 - Inventory (weight, stacking, equip), loot containers, food heals
 - Weapons: melee (axe/sword/bat/pipe), bow with arrow recovery, firearms by tier
 - HUD and minimal menus
+- Main menu replacing the placeholder title screen: settings (graphics, audio, controls, language), new game with seed selection and **character creation**
 
 ## S3 — Threats and stealth
 - Zombie AI: perception, investigate/chase/attack, horde alerting

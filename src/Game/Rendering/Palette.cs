@@ -73,6 +73,9 @@ public static class Palette
     /// </summary>
     public static readonly Color Accent = new(0.48f, 0.52f, 0.95f);
 
+    /// <summary>A lighter accent for text and glyphs, where the display colour would read as black.</summary>
+    public static readonly Color AccentBright = new(0.72f, 0.76f, 1.0f);
+
     /// <summary>A dimmer, redder relative of the accent, for warning light (brake lights, beacons).</summary>
     public static readonly Color Warning = new(0.85f, 0.42f, 0.30f);
 

@@ -48,15 +48,31 @@ public partial class TitleScreen : CanvasLayer
         column.AddThemeConstantOverride("separation", 14);
         centre.AddChild(column);
 
-        var title = MakeLabel("NOCHE CERO", 84, Palette.Accent);
-        title.AddThemeConstantOverride("outline_size", 2);
-        title.AddThemeColorOverride("font_outline_color", new Color(0.02f, 0.02f, 0.05f, 0.9f));
-        column.AddChild(title);
+        // Two words, two tones: the noun stays neutral and the accent lands on "ZERO", which is
+        // also the one colour the rest of the game uses for the things that matter at night.
+        var words = new HBoxContainer
+        {
+            Name = "Words",
+            Alignment = BoxContainer.AlignmentMode.Center,
+        };
+        words.AddThemeConstantOverride("separation", 24);
+        column.AddChild(words);
+        words.AddChild(MakeTitleWord("NIGHT", new Color(0.86f, 0.88f, 0.96f)));
+        words.AddChild(MakeTitleWord("ZERO", Palette.AccentBright));
+
+        var rule = new ColorRect
+        {
+            Name = "Rule",
+            Color = new Color(Palette.Accent.R, Palette.Accent.G, Palette.Accent.B, 0.55f),
+            CustomMinimumSize = new Vector2(320, 2),
+            SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
+        };
+        column.AddChild(rule);
 
         var subtitle = MakeLabel("A post-apocalyptic survival RPG", 22, new Color(0.74f, 0.78f, 0.86f));
         column.AddChild(subtitle);
 
-        column.AddChild(new Control { CustomMinimumSize = new Vector2(0, 28) });
+        column.AddChild(new Control { CustomMinimumSize = new Vector2(0, 24) });
 
         var meta = MakeLabel($"seed {Seed}   ·   version {Version}   ·   {MoodName}", 15, Dim());
         column.AddChild(meta);
@@ -80,6 +96,17 @@ public partial class TitleScreen : CanvasLayer
         _time += delta;
         var alpha = 0.55f + (0.45f * Mathf.Sin((float)_time * 2.4f));
         _prompt.Modulate = new Color(1f, 1f, 1f, alpha);
+    }
+
+    /// <summary>A title word: large, with a soft shadow so it holds over the lit windows behind.</summary>
+    private static Label MakeTitleWord(string text, Color color)
+    {
+        var label = MakeLabel(text, 92, color);
+        label.AddThemeConstantOverride("shadow_offset_x", 0);
+        label.AddThemeConstantOverride("shadow_offset_y", 5);
+        label.AddThemeConstantOverride("shadow_outline_size", 6);
+        label.AddThemeColorOverride("font_shadow_color", new Color(0.02f, 0.02f, 0.06f, 0.75f));
+        return label;
     }
 
     private static Label MakeLabel(string text, int size, Color color)

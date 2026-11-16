@@ -11,8 +11,19 @@ Living design document. Gameplay constants live in the engine-free core (for exa
 3. **Emergent simulation** — gunshots attract hordes, a raided community returns with reinforcements, darkness wakes the ghost, a car is fast and loud.
 4. **Deterministic and legible** — same seed + same inputs ⇒ same outcome (reproducible bugs, honest tests).
 
-## Opening — "Noche Cero"
-Black screen → white text "NOCHE CERO" → low suspense tone → fade into a dark bedroom. The player wakes in bed. Outside: screams, sirens, a flickering streetlight. Within the first in-game minutes, most of the city is infected; only the hostile community's district remains organized.
+## Name and menus
+*Noche Cero* / *Night Zero* is a **working title**: it may change before release, and the repository, save format and namespaces keep it only until it does.
+
+The title screen is a **placeholder**: it shows the generated town and starts the game on any key. The final shell replaces it with a main menu that runs before the first night:
+
+- **Settings**: graphics (renderer, quality, shadows), audio, controls and language.
+- **New game**: seed selection, difficulty, and **character creation**.
+- **Continue / load**, once saves exist.
+
+The opening below stays as designed; the menu only sits in front of it.
+
+## Opening — "Night Zero"
+Black screen → white text "NIGHT ZERO" → low suspense tone → fade into a dark bedroom. The player wakes in bed. Outside: screams, sirens, a flickering streetlight. Within the first in-game minutes, most of the city is infected; only the hostile community's district remains organized.
 
 This is a **scripted intro that hands control back quickly**: pick up the flashlight, open the door, witness the chaos, lock the door. No long cinematic.
 
