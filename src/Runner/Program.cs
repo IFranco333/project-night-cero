@@ -1,9 +1,12 @@
 using System.Diagnostics;
 using System.Globalization;
+using NightCero.Content;
 using NightCero.Core.Ecs;
 using NightCero.Core.Math;
+using NightCero.Core.Navigation;
 using NightCero.Core.Player;
 using NightCero.Core.Simulation;
+using NightCero.Core.WorldGen;
 using NightCero.Core.WorldModel;
 
 namespace NightCero.Runner;
@@ -33,7 +36,23 @@ public static class Program
         }
 
         var simulation = new Simulation(options.Seed);
-        SpawnDemoBodies(simulation.World, options.Bodies, options.Seed);
+        if (options.Town || options.Nav)
+        {
+            var plan = TownGenerator.Generate(options.Seed, TownSettings.Default, BuildingCatalog.All);
+            TownSpawner.Spawn(simulation.World, plan);
+            Console.WriteLine($"town     {plan.Buildings.Count} buildings, {plan.Props.Count} props, {plan.Roads.Count} roads");
+            Console.WriteLine($"townhash {plan.Hash():x16}");
+
+            if (options.Nav)
+            {
+                PrintNavigation(plan);
+            }
+        }
+        else
+        {
+            SpawnDemoBodies(simulation.World, options.Bodies, options.Seed);
+        }
+
         simulation.Run(options.Ticks);
 
         var checkpoint = simulation.Checkpoint();
@@ -80,6 +99,30 @@ public static class Program
         return 0;
     }
 
+    /// <summary>Builds the navigation graph and reports a route between two building entrances.</summary>
+    private static void PrintNavigation(TownPlan plan)
+    {
+        var graph = NavGraphBuilder.FromTown(plan);
+        var roadNodes = graph.IndicesOfKind(NavNodeKind.Intersection).Count
+            + graph.IndicesOfKind(NavNodeKind.Road).Count;
+        Console.WriteLine($"nav      {graph.Count} nodes, {roadNodes} on roads");
+
+        var entrances = graph.IndicesOfKind(NavNodeKind.Entrance);
+        var path = AStar.FindPath(graph, entrances[0], entrances[^1]);
+        if (path is null)
+        {
+            Console.WriteLine("path     none");
+            return;
+        }
+
+        var waypoints = PathSmoother.Smooth(
+            graph,
+            path,
+            (from, to) => TownGeometry.IsSegmentClear(plan, from, to, radius: 0.4f));
+        Console.WriteLine(
+            $"path     {path.Count} nodes, {waypoints.Count} waypoints, {AStar.PathCost(graph, path):F1} m");
+    }
+
     /// <summary>Bodies with a transform and a movement intent, so the benchmark exercises the ECS.</summary>
     private static void SpawnMovingBodies(World world, int count)
     {
@@ -110,15 +153,24 @@ public static class Program
 }
 
 /// <summary>Parsed command-line options of the runner.</summary>
-public sealed record RunnerOptions(ulong Seed, int Ticks, int Bodies, bool ShowState, bool Bench = false)
+public sealed record RunnerOptions(
+    ulong Seed,
+    int Ticks,
+    int Bodies,
+    bool ShowState,
+    bool Bench = false,
+    bool Town = false,
+    bool Nav = false)
 {
     public const string Usage =
-        "usage: nightcero [--seed N] [--ticks N] [--bodies N] [--state] [--bench]\n" +
+        "usage: nightcero [--seed N] [--ticks N] [--bodies N] [--state] [--bench] [--town] [--nav]\n" +
         "  --seed     world seed (default 1)\n" +
         "  --ticks    simulation ticks to run, 100 ms each (default 100)\n" +
         "  --bodies   demo entities to spawn (default 4)\n" +
         "  --state    print the canonical state after the run\n" +
-        "  --bench    measure tick throughput instead of printing the state";
+        "  --bench    measure tick throughput instead of printing the state\n" +
+        "  --town     generate the town for the seed instead of demo bodies\n" +
+        "  --nav      also build the navigation graph and report a route (implies --town)";
 
     /// <summary>Parses the arguments, or returns null (and the caller prints the usage).</summary>
     public static RunnerOptions? Parse(string[] args)
@@ -128,6 +180,8 @@ public sealed record RunnerOptions(ulong Seed, int Ticks, int Bodies, bool ShowS
         var bodies = 4;
         var showState = false;
         var bench = false;
+        var town = false;
+        var nav = false;
 
         for (var i = 0; i < args.Length; i++)
         {
@@ -158,6 +212,12 @@ public sealed record RunnerOptions(ulong Seed, int Ticks, int Bodies, bool ShowS
                 case "--bench":
                     bench = true;
                     break;
+                case "--town":
+                    town = true;
+                    break;
+                case "--nav":
+                    nav = true;
+                    break;
                 case "--help" or "-h":
                     return null;
                 default:
@@ -165,6 +225,6 @@ public sealed record RunnerOptions(ulong Seed, int Ticks, int Bodies, bool ShowS
             }
         }
 
-        return new RunnerOptions(seed, ticks, bodies, showState, bench);
+        return new RunnerOptions(seed, ticks, bodies, showState, bench, town, nav);
     }
 }

@@ -6,5 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Core/NightCero.Core.csproj" />
+    <ProjectReference Include="../Content/NightCero.Content.csproj" />
   </ItemGroup>
 </Project>
