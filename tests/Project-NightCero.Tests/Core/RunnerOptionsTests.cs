@@ -15,14 +15,16 @@ public sealed class RunnerOptionsTests
         Assert.Equal(4, options.Bodies);
         Assert.False(options.ShowState);
         Assert.False(options.Bench);
+        Assert.False(options.Town);
+        Assert.False(options.Nav);
     }
 
     [Fact]
     public void AllOptionsAreParsed()
     {
-        var options = RunnerOptions.Parse(["--seed", "2026", "--ticks", "250", "--bodies", "8", "--state", "--bench"]);
+        var options = RunnerOptions.Parse(["--seed", "2026", "--ticks", "250", "--bodies", "8", "--state", "--bench", "--town", "--nav"]);
 
-        Assert.Equal(new RunnerOptions(2026, 250, 8, true, true), options);
+        Assert.Equal(new RunnerOptions(2026, 250, 8, true, true, true, true), options);
     }
 
     [Fact]
@@ -33,6 +35,26 @@ public sealed class RunnerOptionsTests
         Assert.NotNull(options);
         Assert.True(options.Bench);
         Assert.False(options.ShowState);
+    }
+
+    [Fact]
+    public void TownFlagIsParsed()
+    {
+        var options = RunnerOptions.Parse(["--town"]);
+
+        Assert.NotNull(options);
+        Assert.True(options.Town);
+        Assert.False(options.Bench);
+    }
+
+    [Fact]
+    public void NavFlagIsParsed()
+    {
+        var options = RunnerOptions.Parse(["--nav"]);
+
+        Assert.NotNull(options);
+        Assert.True(options.Nav);
+        Assert.False(options.Town);
     }
 
     [Theory]
