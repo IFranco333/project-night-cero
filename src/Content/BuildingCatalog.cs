@@ -8,8 +8,8 @@ namespace NightCero.Content;
 /// </summary>
 /// <remarks>
 /// <see cref="Validate"/> runs at boot and in tests, so a malformed catalog fails before a world is
-/// generated. Unique kinds (the church and the hospital) are never picked at random; the generator
-/// assigns each one to a single landmark building.
+/// generated. Unique kinds (the church, the hospital and the police station) are never picked at
+/// random; the generator assigns each one to a single landmark building.
 /// </remarks>
 public static class BuildingCatalog
 {
@@ -17,7 +17,9 @@ public static class BuildingCatalog
     public static IReadOnlyList<BuildingDefinition> All { get; } =
     [
         new(BuildingKind.House, "House", MinWidth: 8, MaxWidth: 16, MinDepth: 8, MaxDepth: 16,
-            MinFloors: 1, MaxFloors: 2, Weight: 50),
+            MinFloors: 1, MaxFloors: 2, Weight: 46),
+        new(BuildingKind.Mansion, "Mansion", MinWidth: 16, MaxWidth: 24, MinDepth: 14, MaxDepth: 22,
+            MinFloors: 2, MaxFloors: 3, Weight: 6),
         new(BuildingKind.Shop, "Shop", MinWidth: 12, MaxWidth: 20, MinDepth: 12, MaxDepth: 20,
             MinFloors: 1, MaxFloors: 1, Weight: 18),
         new(BuildingKind.Warehouse, "Warehouse", MinWidth: 16, MaxWidth: 26, MinDepth: 14, MaxDepth: 24,
@@ -28,6 +30,8 @@ public static class BuildingCatalog
             MinFloors: 1, MaxFloors: 1, Weight: 0, Unique: true),
         new(BuildingKind.Hospital, "Hospital", MinWidth: 20, MaxWidth: 28, MinDepth: 20, MaxDepth: 28,
             MinFloors: 2, MaxFloors: 3, Weight: 0, Unique: true),
+        new(BuildingKind.Police, "Police station", MinWidth: 18, MaxWidth: 24, MinDepth: 16, MaxDepth: 22,
+            MinFloors: 1, MaxFloors: 2, Weight: 0, Unique: true),
     ];
 
     /// <summary>The definition of a kind; throws when the catalog has none.</summary>

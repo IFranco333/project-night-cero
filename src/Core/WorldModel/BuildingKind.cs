@@ -4,9 +4,11 @@ namespace NightCero.Core.WorldModel;
 public enum BuildingKind
 {
     House,
+    Mansion,
     Shop,
     Warehouse,
     Garage,
     Church,
     Hospital,
+    Police,
 }

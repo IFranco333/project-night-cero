@@ -32,7 +32,7 @@ public sealed class TownGeneratorTests
     [Fact]
     public void GoldenHashIsStableForSeed2026()
     {
-        Assert.Equal(11981727827692508325UL, TownFixtures.Plan(2026).Hash());
+        Assert.Equal(8270809061421129897UL, TownFixtures.Plan(2026).Hash());
     }
 
     [Fact]
@@ -94,12 +94,63 @@ public sealed class TownGeneratorTests
     }
 
     [Fact]
-    public void ThePlanHasExactlyOneHospitalAndOneChurch()
+    public void ThePlanHasExactlyOneOfEveryLandmark()
     {
         var plan = TownFixtures.Plan();
 
         Assert.Single(plan.Buildings, building => building.Kind == BuildingKind.Hospital);
         Assert.Single(plan.Buildings, building => building.Kind == BuildingKind.Church);
+        Assert.Single(plan.Buildings, building => building.Kind == BuildingKind.Police);
+    }
+
+    [Fact]
+    public void TheBiggestBuildingIsTheHospital()
+    {
+        var plan = TownFixtures.Plan();
+        var biggest = plan.Buildings.MaxBy(building => building.Width * building.Depth);
+
+        Assert.Equal(BuildingKind.Hospital, biggest.Kind);
+    }
+
+    [Fact]
+    public void ExactlyOneHouseHidesTheCatacombEntrance()
+    {
+        var plan = TownFixtures.Plan();
+
+        var entrance = Assert.Single(plan.Buildings, building => building.CatacombEntrance);
+        Assert.Contains(entrance.Kind, new[] { BuildingKind.House, BuildingKind.Mansion });
+    }
+
+    [Fact]
+    public void BasementsOnlyAppearUnderHousesAndMansions()
+    {
+        var plan = TownFixtures.Plan();
+        var basements = plan.Buildings.Where(building => building.HasBasement).ToArray();
+
+        Assert.NotEmpty(basements);
+        Assert.All(basements, building =>
+            Assert.Contains(building.Kind, new[] { BuildingKind.House, BuildingKind.Mansion }));
+    }
+
+    [Fact]
+    public void EveryForestBlockIsWoodedAndHasNoBuildings()
+    {
+        // The slice town, not the small fixture: 16 blocks are too few to guarantee a wood.
+        var plan = TownGenerator.Generate(2026, TownSettings.Default, BuildingCatalog.All);
+        var forests = plan.Blocks.Where(block => block.Kind == BlockKind.Forest).ToArray();
+        Assert.NotEmpty(forests);
+
+        foreach (var forest in forests)
+        {
+            var trees = plan.Props.Count(prop =>
+                prop.Kind == PropKind.Tree
+                && forest.Bounds.Contains(new Vec2(prop.Position.X, prop.Position.Z)));
+
+            Assert.True(trees >= 40, $"forest block at {forest.Bounds.MinX},{forest.Bounds.MinY} has only {trees} trees");
+            Assert.DoesNotContain(
+                plan.Buildings,
+                building => forest.Bounds.Contains(new Vec2(building.Centre.X, building.Centre.Z)));
+        }
     }
 
     [Fact]

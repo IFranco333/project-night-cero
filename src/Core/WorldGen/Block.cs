@@ -11,6 +11,9 @@ public enum BlockKind
     /// <summary>A park: grass, trees and a path across it.</summary>
     Park,
 
+    /// <summary>A wood: dense trees, no buildings and no path.</summary>
+    Forest,
+
     /// <summary>An empty lot: bare ground, no buildings.</summary>
     Empty,
 }

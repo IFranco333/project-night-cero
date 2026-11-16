@@ -58,7 +58,10 @@ public sealed record TownPlan(
                 .Append(" c=").Append(Format(building.Centre))
                 .Append(" size=").Append(Number(building.Width)).Append('x').Append(Number(building.Depth))
                 .Append(" floors=").Append(building.Floors.ToString(CultureInfo.InvariantCulture))
-                .Append(" entrance=").Append(Format(building.Entrance)).Append('\n');
+                .Append(" entrance=").Append(Format(building.Entrance))
+                .Append(building.HasBasement ? " basement" : string.Empty)
+                .Append(building.CatacombEntrance ? " catacomb" : string.Empty)
+                .Append('\n');
             foreach (var room in building.Rooms)
             {
                 text.Append("  room ").Append(room.Index.ToString(CultureInfo.InvariantCulture))

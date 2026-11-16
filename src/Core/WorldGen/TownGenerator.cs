@@ -50,6 +50,7 @@ public static class TownGenerator
         var blocksRng = root.Fork("blocks");
         var buildingsRng = root.Fork("buildings");
         var propsRng = root.Fork("props");
+        var featuresRng = root.Fork("features");
 
         var roads = BuildRoads(settings);
         var blocks = new List<Block>();
@@ -72,6 +73,13 @@ public static class TownGenerator
 
                 if (roll < 0.16)
                 {
+                    blocks.Add(new Block(block, BlockKind.Forest));
+                    AddForestProps(props, block, propsRng);
+                    continue;
+                }
+
+                if (roll < 0.22)
+                {
                     blocks.Add(new Block(block, BlockKind.Empty));
                     continue;
                 }
@@ -90,6 +98,7 @@ public static class TownGenerator
         }
 
         AssignUniqueKinds(buildings, catalog);
+        AssignFeatures(buildings, settings, featuresRng);
         AddStreetProps(props, settings, propsRng);
 
         return new TownPlan(
@@ -272,11 +281,17 @@ public static class TownGenerator
 
     /// <summary>
     /// Gives each unique kind to one landmark building. Landmarks are the largest structures in
-    /// town, with ties broken by id, so the assignment is stable for a given plan.
+    /// town, with ties broken by id, so the assignment is stable for a given plan. The uniques are
+    /// ordered by the footprint they need, so the biggest building becomes the hospital rather than
+    /// the church.
     /// </summary>
     private static void AssignUniqueKinds(List<Building> buildings, IReadOnlyList<BuildingDefinition> catalog)
     {
-        var unique = catalog.Where(d => d.Unique).OrderBy(d => d.Kind).ToArray();
+        var unique = catalog
+            .Where(d => d.Unique)
+            .OrderByDescending(d => d.MaxWidth * d.MaxDepth)
+            .ThenBy(d => d.Kind)
+            .ToArray();
         if (unique.Length == 0 || buildings.Count == 0)
         {
             return;
@@ -300,6 +315,55 @@ public static class TownGenerator
         }
     }
 
+    /// <summary>
+    /// Adds the features that only some buildings have: a cellar under many houses, and the single
+    /// stair down to the catacombs.
+    /// </summary>
+    /// <remarks>
+    /// These draws go to their own stream so that adding a feature never shifts the stream that
+    /// places buildings. The catacomb entrance is chosen by distance to the town centre instead of
+    /// by a roll, so the way underground is always near where the player starts.
+    /// </remarks>
+    private static void AssignFeatures(List<Building> buildings, TownSettings settings, RngStream rng)
+    {
+        for (var i = 0; i < buildings.Count; i++)
+        {
+            var building = buildings[i];
+            if (building.Kind is BuildingKind.House or BuildingKind.Mansion && rng.NextDouble() < 0.35)
+            {
+                buildings[i] = building with { HasBasement = true };
+            }
+        }
+
+        var centreX = settings.Width / 2f;
+        var centreZ = settings.Height / 2f;
+        var candidates = Enumerable.Range(0, buildings.Count)
+            .OrderBy(index =>
+            {
+                var position = buildings[index].Centre;
+                var dx = position.X - centreX;
+                var dz = position.Z - centreZ;
+                return (dx * dx) + (dz * dz);
+            })
+            .ThenBy(index => index)
+            .ToArray();
+
+        if (candidates.Length == 0)
+        {
+            return;
+        }
+
+        // Houses first: a cellar door under a home is the way in; any building is the fallback when
+        // the seed produced no house at all.
+        var house = candidates
+            .Where(index => buildings[index].Kind is BuildingKind.House or BuildingKind.Mansion)
+            .Select(index => (int?)index)
+            .FirstOrDefault();
+        var entrance = house ?? candidates[0];
+
+        buildings[entrance] = buildings[entrance] with { CatacombEntrance = true };
+    }
+
     private static void AddParkProps(List<Prop> props, Rect2 block, RngStream rng)
     {
         var inner = block.Expand(-1.5f);
@@ -318,6 +382,20 @@ public static class TownGenerator
                 PropKind.Bench,
                 new Vec3(block.Centre.X, 0, block.Centre.Y),
                 rng.NextInt(0, 3) * 90f));
+        }
+    }
+
+    /// <summary>Fills a wood: far more trees than a park, and nothing else.</summary>
+    private static void AddForestProps(List<Prop> props, Rect2 block, RngStream rng)
+    {
+        var inner = block.Expand(-2f);
+        var count = rng.NextInt(40, 80);
+
+        for (var i = 0; i < count; i++)
+        {
+            var x = inner.MinX + ((float)rng.NextDouble() * inner.Width);
+            var z = inner.MinY + ((float)rng.NextDouble() * inner.Height);
+            props.Add(new Prop(PropKind.Tree, new Vec3(x, 0, z), rng.NextInt(0, 359)));
         }
     }
 
