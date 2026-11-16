@@ -1,8 +1,8 @@
 # Sprint 1 — World, navigation, opening
 
 **Goal:** a seeded town, a content catalog and a navigation graph, all engine-free and testable.
-Status: in progress — world generation, content and navigation are done; visibility and the Godot
-opening scene remain.
+Status: in progress — world generation, content, navigation and the rendered town are done; camera
+visibility and the Godot opening scene remain.
 
 ## Delivered
 
@@ -36,9 +36,18 @@ opening scene remain.
   `TownGeometry.IsSegmentClear`.
 - Runner `--town` and `--nav` for inspecting generation and routing headlessly.
 
+### S1-5 — The town as a place (added later in the sprint)
+- Block kinds: built, park, wood and empty lot, with sidewalks, curbs, park paths and road markings.
+- Landmarks: church, hospital and police station, each unique and assigned by required footprint;
+  mansions join the catalog.
+- Cellars under houses and mansions, and exactly one catacomb entrance, nearest the centre.
+- The Godot layer draws the plan with instanced meshes, a palette in one file, three lighting
+  presets and a procedural night sky (cloud, stars, moon).
+- Title screen over the drifting town; CI builds the Godot project without the editor.
+
 ## Not delivered
 - Camera visibility and explored-map fog.
-- The "Noche Cero" opening scene, which needs the Godot 4 .NET editor.
+- The "Noche Cero" opening scene (wake in bed), which needs the Godot 4 .NET editor.
 
 ## Lessons
 - **Struct defaults are not parameter defaults.** `TownSettings.Default => new()` zero-initialised
@@ -51,3 +60,8 @@ opening scene remain.
   branch and regression tests.
 - **Assets should be data, not constants.** Passing the catalog into the generator keeps the core
   free of `NightCero.Content` and lets tests generate towns with a hand-written catalog.
+- **Give new features their own RNG stream.** Cellars and the catacomb entrance use
+  `town/features`; adding one never moves the buildings, so the golden diff shows only the new
+  feature.
+- **Say that the art is placeholder, in the repo.** A cloneable prototype invites "this is what
+  the game looks like"; the README now states it before the first screenshot can suggest otherwise.

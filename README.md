@@ -73,6 +73,9 @@ Every night begins the same way and ends differently. Your job is to make the ne
 
 ### Systems
 
+The table describes the full vertical slice as designed. Only the world generation and the
+presentation layer exist today; the rest is scheduled — see [Project status](#project-status).
+
 | System | Description |
 |---|---|
 | **Cameras** | Third-person by default; smooth first-person aim for precise shooting |
@@ -254,14 +257,17 @@ dotnet format Project-NightCero.sln --verify-no-changes
 
 ### Run the game
 
-The Godot project lives in `src/Game/` and is added in milestone S0. Until then there is nothing to open in the editor; the simulation is built and tested as shown above. Current status of the game layer: [`src/Game/README.md`](src/Game/README.md).
+The Godot project lives in `src/Game/`. Open `src/Game/project.godot` with the Godot 4 **.NET**
+editor (the editor is only needed to run scenes; `dotnet build src/Game/NightCero.Game.csproj`
+compiles the C# layer without it). The game opens on the title screen and starts the town on any
+key. Current status of the game layer: [`src/Game/README.md`](src/Game/README.md).
 
 ## Project status
 
 | Milestone | Goal | Status |
 |---|---|---|
-| **S0 — Foundations** | Solution, ECS, deterministic RNG, headless runner, player movement, camera math, Godot scene shell, "Noche Cero" title screen | 🟡 in progress (engine-free core done; Godot shell pending) |
-| **S1 — World, navigation, opening** | Town generator, nav graph, visibility, opening scene | 🟡 in progress (town generation, content catalog and navigation done; visibility and opening scene pending) |
+| **S0 — Foundations** | Solution, ECS, deterministic RNG, headless runner, player movement, camera math, Godot scene shell, title screen | ✅ done |
+| **S1 — World, navigation, opening** | Town generator, nav graph, visibility, opening scene | 🟡 in progress (town generation, content catalog, navigation and the rendered town are done; camera visibility and the wake-in-bed opening remain) |
 | **S2 — Player, equipment, combat** | Movement, cameras, survival stats, injuries, weapons, inventory, HUD | ⬜ planned |
 | **S3 — Threats and stealth** | Zombie AI, hostile community AI, stealth, catacomb | ⬜ planned |
 | **S4 — Vehicles, progression, atmosphere** | Car, XP/skills, day counter, hospital, first full night | ⬜ planned |
