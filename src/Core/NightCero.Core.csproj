@@ -3,6 +3,6 @@
     <RootNamespace>NightCero.Core</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <InternalsVisibleTo Include="NightCero.Tests" />
+    <InternalsVisibleTo Include="Project-NightCero.Tests" />
   </ItemGroup>
 </Project>
