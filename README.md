@@ -5,6 +5,7 @@
 ![Godot](https://img.shields.io/badge/Godot-4.x%20(.NET)-478CBF)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![coverage](https://img.shields.io/badge/coverage-88%25-brightgreen)
+![release](https://img.shields.io/github/v/release/IFranco333/project-night-cero?include_prereleases&label=release&color=7a85f2)
 
 # Noche Cero
 
@@ -189,6 +190,7 @@ On every push and pull request, CI runs the Godot-free guard on the core project
 - **Test-driven development** for simulation logic: a failing test first, the minimal implementation second, a refactor third.
 - **Architecture Decision Records** in [`docs/adr/`](docs/adr/) capture every decision that is expensive to reverse.
 - The [design document](docs/design.md) and the code are updated in the same change.
+- Work is tracked as **GitHub issues** grouped by milestone, and each PR closes its issue; the roadmap links to them.
 
 ## Getting started
 

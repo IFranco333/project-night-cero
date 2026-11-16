@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-pre] - 2026-11-16
+
+Engineering preview: the deterministic core, the generated town and the Godot presentation layer.
+**Not a playable game yet** — there are no threats, loot or survival stats, and all art is
+placeholder.
+
 ### Added
 
 - Project documentation: vision, vertical-slice design, architecture, roadmap and ADRs.
