@@ -4,10 +4,13 @@ The Godot 4 (.NET) project: scenes, the camera rig, input mapping, UI, meshes an
 
 **Status:** the project opens on a title screen over the drifting town; any key starts the game. It
 generates the town from the seed, draws it with instanced boxes and lets you walk around in third
-or first person, under a procedural night sky with clouds, stars and a moon. Art is grey-box on
-purpose — this layer exists to see and tune the world, not to be final. Every colour lives in
-`Rendering/Palette.cs` and every lighting preset in `Rendering/Mood.cs`, so the look is retuned in
-one place.
+or first person, under a procedural night sky with clouds, stars and a moon.
+
+**The art is placeholder, and deliberately so.** Every mesh is an untextured box; there are no
+models, textures, animations, characters or audio. This layer exists to see and tune the world, not
+to be final: the final game will have full 3D art, and none of what you can run today is the
+intended look. Every colour lives in `Rendering/Palette.cs` and every lighting preset in
+`Rendering/Mood.cs`, so the look is retuned in one place.
 
 ## Run it
 

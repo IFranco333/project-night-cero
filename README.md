@@ -52,6 +52,8 @@ Survive the infected, the darkness below, and the people who locked themselves i
 
 The project is also a software engineering exercise in building a real-time 3D game whose simulation is fully deterministic and testable without a graphics engine.
 
+> **Prototype notice — the art is placeholder.** Every mesh in the current build is an untextured box. There are no models, textures, animations, characters or audio yet, and the town is generated to exercise the simulation, not to look like the final game. The final game will have full 3D art; nothing you can run today is the intended look.
+
 ## The game
 
 ### Premise
@@ -211,10 +213,13 @@ Generate the town for a seed and route between two building entrances:
 
 ```bash
 dotnet run --project src/Runner -- --seed 2026 --ticks 0 --town --nav
-# town     724 buildings, 462 props, 34 roads
-# townhash c8563165bf2ba905
-# nav      3555 nodes, 1921 on roads
-# path     125 nodes, 19 waypoints, 1966.7 m
+# town     654 buildings, 1659 props, 34 roads
+# blocks   Built 191, Park 24, Forest 21, Empty 20
+# kinds    House 335, Mansion 51, Shop 128, Warehouse 48, Garage 89, Church 1, Hospital 1, Police 1
+# features 1193 trees in 21 woods, 124 basements, catacomb entrance under Mansion #303
+# townhash 77ed45815b40cd5d
+# nav      3453 nodes, 1921 on roads
+# path     109 nodes, 18 waypoints, 1720.3 m
 ```
 
 Measure tick throughput (timing lives in the runner, not the deterministic core):
@@ -224,7 +229,7 @@ dotnet run --project src/Runner -- --seed 2026 --ticks 20000 --bodies 1000 --ben
 # ticks/s ~439, ms/tick ~2.28 on the development machine
 ```
 
-To run the game once the Godot project lands (milestone S0), open `src/Game/project.godot` with the Godot 4 **.NET** editor.
+To run the game, open `src/Game/project.godot` with the Godot 4 **.NET** editor. The editor is only needed to run scenes: the C# layer builds with `dotnet build src/Game/NightCero.Game.csproj`, which is what CI does. Expect boxes — see the prototype notice above.
 
 ### Prerequisites
 

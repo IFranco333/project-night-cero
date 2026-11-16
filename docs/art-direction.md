@@ -4,6 +4,13 @@ How the town should read before any final asset exists, and where each decision 
 The goal is that a grey-box does not look like a grey-box: shape, light and colour carry the mood
 while the meshes are still boxes.
 
+## Current state
+
+The art is **placeholder**: every mesh is an untextured box, and there are no models, textures,
+animations, characters or audio. This document describes the direction the final art will follow,
+and the parts of it that already live in code (palette, lighting, sky); it is not a description of
+the current build's fidelity. Do not judge the final look by a screenshot of this stage.
+
 ## Pillars
 
 1. **Cold, quiet, empty.** The dominant colours are desaturated and cold. Warm light is scarce and
