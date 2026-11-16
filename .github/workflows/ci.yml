@@ -68,3 +68,18 @@ jobs:
         with:
           name: coverage-${{ matrix.os }}
           path: coverage/
+
+  game:
+    needs: guard-core
+    name: game build (Godot)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      # The Godot project is not part of the solution (it needs the Godot SDK), so it gets its own
+      # job. No editor or Godot binary is required: Godot.NET.Sdk comes from NuGet and only the
+      # C# layer is compiled. This is what catches a broken Game-layer build before a human runs it.
+      - name: Build the Godot project
+        run: dotnet build src/Game/NightCero.Game.csproj --configuration Release

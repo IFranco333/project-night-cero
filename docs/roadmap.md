@@ -12,8 +12,8 @@ Goal: solution builds, deterministic core skeleton tested, Godot opens a scene.
 - [x] Headless sim runner + state hash
 - [x] Player movement system (intent → transform) and third-person camera math
 - [x] Godot scene: ground, instanced boxes, third-person camera, WASD movement demo
-- [ ] "Noche Cero" title screen
-- [ ] Godot headless build job in CI
+- [x] "Noche Cero" title screen
+- [x] Godot headless build job in CI
 - [x] ADRs 0001–0003 accepted
 
 Status detail and lessons: [`docs/sprints/sprint-0.md`](sprints/sprint-0.md).

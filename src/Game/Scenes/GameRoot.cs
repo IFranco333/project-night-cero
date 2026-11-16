@@ -24,13 +24,17 @@ namespace NightCero.Game;
 /// <para>
 /// Command line (<c>--</c> separates engine flags from these): <c>--seed=123</c> picks the world,
 /// <c>--screenshot=path.png</c> renders a few frames, saves an image and quits — used to check the
-/// generated town without a human watching.
+/// generated town without a human watching. A screenshot run starts in the town; add
+/// <c>--title</c> to capture the title screen instead.
 /// </para>
 /// </remarks>
 public partial class GameRoot : Node3D
 {
     private const int TicksPerFrameLimit = 8;
     private const int ScreenshotFrames = 45;
+
+    /// <summary>Degrees per second the title screen orbits the town.</summary>
+    private const float TitleOrbitSpeed = 3.5f;
 
     [Export]
     public ulong Seed { get; set; } = 2026;
@@ -41,8 +45,14 @@ public partial class GameRoot : Node3D
     private Node3D _lighting = null!;
     private Label _hud = null!;
     private Label _crosshair = null!;
+    private TitleScreen? _title;
     private string? _screenshotPath;
     private bool _shadows = true;
+    private bool _started;
+    private bool _keepTitle;
+    private bool _poseGiven;
+    private float _titleYaw;
+    private float _titleSeconds;
     private Mood _mood = Mood.Night;
     private float? _yaw;
     private float? _pitch;
@@ -81,6 +91,19 @@ public partial class GameRoot : Node3D
 
         BuildHud();
 
+        _poseGiven = _yaw is not null || _pitch is not null || _distance is not null;
+
+        // A screenshot run is an inspection run: it starts in the town unless the caller asked for
+        // the title screen on purpose.
+        if (_screenshotPath is not null && !_keepTitle)
+        {
+            StartGame();
+        }
+        else
+        {
+            ShowTitle();
+        }
+
         GD.Print(
             $"town seed={Seed} buildings={_plan.Buildings.Count} props={_plan.Props.Count} "
             + $"hash={_plan.Hash():x16}");
@@ -88,6 +111,20 @@ public partial class GameRoot : Node3D
 
     public override void _Process(double delta)
     {
+        if (!_started)
+        {
+            // The title screen is a menu, not a pause: the simulation has not started, and the
+            // camera drifts around the spawn point so the town is visible behind the text.
+            _titleYaw += (float)delta * TitleOrbitSpeed;
+            _titleSeconds += (float)delta;
+            _player.SetPose(_titleYaw, 22f, 70f);
+            var spawn = _simulation.World.Get<Transform>(_simulation.Player);
+            _player.Position = ToGodot(spawn.Position);
+            _player.UpdateCamera(spawn.Position, delta);
+            CaptureScreenshotIfDue();
+            return;
+        }
+
         _simulation.Submit(_player.ReadIntent());
 
         _accumulator += delta;
@@ -105,17 +142,45 @@ public partial class GameRoot : Node3D
         _player.UpdateCamera(transform.Position, delta);
         UpdateHud(transform);
 
-        if (_screenshotPath is not null && ++_frames >= ScreenshotFrames)
-        {
-            var image = GetViewport().GetTexture().GetImage();
-            image.SavePng(_screenshotPath);
-            GD.Print($"screenshot {_screenshotPath}");
-            GetTree().Quit();
-        }
+        CaptureScreenshotIfDue();
     }
 
     public override void _UnhandledInput(InputEvent @event)
     {
+        if (!_started)
+        {
+            // --title is an inspection mode: the title stays up so a screenshot is reproducible.
+            if (_keepTitle)
+            {
+                return;
+            }
+
+            // The window can deliver a stray key event in its first frames (at least on the GL
+            // Compatibility backend); ignore the first half second so the title is not skipped
+            // before it is drawn.
+            if (_titleSeconds < 0.5f)
+            {
+                return;
+            }
+
+            // Any deliberate input starts the game. Escape is excluded: it is the release-mouse key
+            // once the game is running, and starting on it would be a surprise.
+            var start = @event switch
+            {
+                InputEventKey { Pressed: true, Echo: false } key => key.Keycode != Key.Escape,
+                InputEventMouseButton { Pressed: true } => true,
+                InputEventJoypadButton { Pressed: true } => true,
+                _ => false,
+            };
+
+            if (start)
+            {
+                StartGame();
+            }
+
+            return;
+        }
+
         if (@event.IsActionPressed("toggle_debug"))
         {
             _hud.Visible = !_hud.Visible;
@@ -128,6 +193,61 @@ public partial class GameRoot : Node3D
     }
 
     // ---- Scene setup ---------------------------------------------------------------------
+
+    /// <summary>Shows the title over the drifting town and leaves the simulation paused.</summary>
+    private void ShowTitle()
+    {
+        _hud.Visible = false;
+        _player.Avatar.Visible = false;
+        Input.MouseMode = Input.MouseModeEnum.Visible;
+
+        _title = new TitleScreen
+        {
+            Name = "Title",
+            Seed = Seed,
+            Version = ProjectSettings.GetSetting("application/config/version", "0.0.0").AsString(),
+            MoodName = _mood.Name,
+        };
+        AddChild(_title);
+    }
+
+    /// <summary>Leaves the title screen and hands control to the player.</summary>
+    private void StartGame()
+    {
+        _started = true;
+
+        if (_title is not null)
+        {
+            _title.QueueFree();
+            _title = null;
+        }
+
+        _hud.Visible = true;
+        _player.Avatar.Visible = _player.Mode == CameraMode.Third;
+        Input.MouseMode = Input.MouseModeEnum.Captured;
+
+        // The title orbits at inspection distance; starting returns to the gameplay view, unless the
+        // caller pinned a pose on the command line.
+        _player.SetPose(
+            _poseGiven ? _yaw ?? 0f : 0f,
+            _poseGiven ? _pitch ?? 14f : 14f,
+            _poseGiven ? _distance ?? PlayerController.ThirdPersonDistance : PlayerController.ThirdPersonDistance);
+
+        GD.Print("start");
+    }
+
+    private void CaptureScreenshotIfDue()
+    {
+        if (_screenshotPath is null || ++_frames < ScreenshotFrames)
+        {
+            return;
+        }
+
+        var image = GetViewport().GetTexture().GetImage();
+        image.SavePng(_screenshotPath);
+        GD.Print($"screenshot {_screenshotPath}");
+        GetTree().Quit();
+    }
 
     private void SetMood(Mood mood)
     {
@@ -211,6 +331,10 @@ public partial class GameRoot : Node3D
             else if (argument == "--no-shadows")
             {
                 _shadows = false;
+            }
+            else if (argument == "--title")
+            {
+                _keepTitle = true;
             }
             else if (argument.StartsWith("--yaw=", StringComparison.Ordinal))
             {

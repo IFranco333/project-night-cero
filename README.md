@@ -89,7 +89,7 @@ The full long-term scope — larger regions, more communities, new threats, craf
 
 ## Current status
 
-> **World stage (S1).** The engine-free core is in place: a deterministic fixed-tick loop, an entity–component world with deferred structural changes, seeded RNG with golden tests, a state hash, a headless CLI runner, player movement and third-person camera math. World generation produces a seeded town — a road grid, blocks that are built, park, wood or empty, buildings with interiors and landmarks, cellars and a catacomb entrance, and static props — plus a navigation graph with A* and path smoothing. The Godot layer draws that town with instanced meshes under a procedural night sky and lets you walk it in third or first person. **There is no gameplay yet**: no threats, loot or survival stats.
+> **World stage (S1).** The engine-free core is in place: a deterministic fixed-tick loop, an entity–component world with deferred structural changes, seeded RNG with golden tests, a state hash, a headless CLI runner, player movement and third-person camera math. World generation produces a seeded town — a road grid, blocks that are built, park, wood or empty, buildings with interiors and landmarks, cellars and a catacomb entrance, and static props — plus a navigation graph with A* and path smoothing. The Godot layer opens on the title screen, then draws that town with instanced meshes under a procedural night sky and lets you walk it in third or first person. CI also builds the Godot project on Linux without the editor. **There is no gameplay yet**: no threats, loot or survival stats.
 
 The project is developed in the open, with every feature shipped together with its tests and documentation.
 

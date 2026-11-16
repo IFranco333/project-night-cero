@@ -8,6 +8,7 @@ config_version=5
 
 config/name="Noche Cero"
 config/description="Post-apocalyptic survival RPG — vertical slice."
+config/version="0.1.0"
 run/main_scene="res://Scenes/Main.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 

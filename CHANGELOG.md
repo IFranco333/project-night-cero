@@ -59,6 +59,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The renderer draws road markings, building windows (some lit) and cellar/catacomb hatches.
 - The runner's `--town` report now breaks the plan down by block kind, building kind, prop mix and
   features (trees in woods, basements, catacomb entrance).
+- Title screen (`Scenes/TitleScreen.cs`): the town drifts behind it while the camera orbits, with
+  the seed, the project version and the lighting preset on show. Any key or click starts the game.
+  `--title` keeps it up, so `--screenshot=… --title` captures the title reproducibly.
+- CI job `game`: builds the Godot project on Linux with no editor and no Godot binary — the C#
+  layer compiles against `Godot.NET.Sdk` from NuGet, which catches a broken Game-layer build
+  before a human runs it.
 
 ### Changed
 
