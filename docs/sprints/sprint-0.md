@@ -1,8 +1,8 @@
 # Sprint 0 — Foundations (retro)
 
 **Goal:** a solution that builds, a deterministic engine-free core covered by tests, and a Godot
-scene that opens. The core half is done; the Godot half is pending a machine with the Godot .NET
-editor installed.
+scene that opens. Both halves are done: the Godot scene runs, and the title screen and the CI build
+job closed the last two items later in the sprint.
 
 ## Delivered
 
@@ -42,12 +42,13 @@ editor installed.
   seed or a different log diverges.
 - `--bench` in the runner measures tick throughput (timing stays out of the deterministic core).
 
-## Not delivered (needs Godot)
-- Godot scene shell: ground, instanced boxes, `Camera3D` driven by `ThirdPersonRig`, WASD demo.
-- "Noche Cero" title screen.
-- Godot headless build job in CI.
+## Delivered later in the sprint
 
-These are tracked in `docs/roadmap.md` (S0) and require the Godot 4 **.NET** editor.
+These needed the Godot 4 **.NET** editor and landed after the retro was first written:
+
+- Godot scene shell: ground, instanced boxes, `Camera3D` driven by `ThirdPersonRig`, WASD demo.
+- Title screen over the drifting town (now reads **NIGHT ZERO**, the working title in English).
+- Godot build job in CI (`game`), which compiles the project on Linux without the editor.
 
 ## Lessons
 - **Review pays for itself.** A code review of the ECS found ten real defects (shared static columns,
