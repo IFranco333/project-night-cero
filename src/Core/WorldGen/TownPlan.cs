@@ -20,6 +20,7 @@ public sealed record TownPlan(
     int BlockPitch,
     int RoadWidth,
     IReadOnlyList<RoadSegment> Roads,
+    IReadOnlyList<Block> Blocks,
     IReadOnlyList<Building> Buildings,
     IReadOnlyList<Prop> Props)
 {
@@ -40,6 +41,14 @@ public sealed record TownPlan(
         {
             text.Append("road ").Append(Format(road.Start)).Append(" -> ").Append(Format(road.End))
                 .Append(" w=").Append(Number(road.Width)).Append('\n');
+        }
+
+        foreach (var block in Blocks)
+        {
+            text.Append("block ").Append(block.Kind)
+                .Append(" min=").Append(Format(new Vec3(block.Bounds.MinX, 0, block.Bounds.MinY)))
+                .Append(" max=").Append(Format(new Vec3(block.Bounds.MaxX, 0, block.Bounds.MaxY)))
+                .Append('\n');
         }
 
         foreach (var building in Buildings)

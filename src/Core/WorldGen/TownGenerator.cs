@@ -52,6 +52,7 @@ public static class TownGenerator
         var propsRng = root.Fork("props");
 
         var roads = BuildRoads(settings);
+        var blocks = new List<Block>();
         var buildings = new List<Building>();
         var props = new List<Prop>();
 
@@ -64,15 +65,18 @@ public static class TownGenerator
 
                 if (roll < 0.10)
                 {
+                    blocks.Add(new Block(block, BlockKind.Park));
                     AddParkProps(props, block, propsRng);
                     continue;
                 }
 
                 if (roll < 0.16)
                 {
+                    blocks.Add(new Block(block, BlockKind.Empty));
                     continue;
                 }
 
+                blocks.Add(new Block(block, BlockKind.Built));
                 AddBlockBuildings(buildings, block, settings, generic, buildingsRng);
 
                 if (propsRng.NextDouble() < 0.4)
@@ -95,6 +99,7 @@ public static class TownGenerator
             settings.BlockPitch,
             settings.RoadWidth,
             roads,
+            blocks,
             buildings,
             props);
     }

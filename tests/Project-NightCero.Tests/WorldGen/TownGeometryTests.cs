@@ -69,6 +69,7 @@ public sealed class TownGeometryTests
             BlockPitch: 50,
             RoadWidth: 8,
             Roads: [],
+            Blocks: [],
             Buildings: [building],
             Props: []);
     }

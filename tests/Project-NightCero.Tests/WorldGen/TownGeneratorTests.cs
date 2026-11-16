@@ -32,7 +32,7 @@ public sealed class TownGeneratorTests
     [Fact]
     public void GoldenHashIsStableForSeed2026()
     {
-        Assert.Equal(4253105418989793823UL, TownFixtures.Plan(2026).Hash());
+        Assert.Equal(11981727827692508325UL, TownFixtures.Plan(2026).Hash());
     }
 
     [Fact]
@@ -100,6 +100,63 @@ public sealed class TownGeneratorTests
 
         Assert.Single(plan.Buildings, building => building.Kind == BuildingKind.Hospital);
         Assert.Single(plan.Buildings, building => building.Kind == BuildingKind.Church);
+    }
+
+    [Fact]
+    public void ThePlanHasOneBlockPerGridCell()
+    {
+        var settings = TownFixtures.Small;
+        var plan = TownFixtures.Plan();
+
+        Assert.Equal(settings.BlocksX * settings.BlocksZ, plan.Blocks.Count);
+        Assert.All(plan.Blocks, block => Assert.True(block.Bounds.Width > 0 && block.Bounds.Height > 0));
+    }
+
+    [Fact]
+    public void EveryParkBlockHasTreesAndNoBuildings()
+    {
+        var plan = TownFixtures.Plan();
+        var parks = plan.Blocks.Where(block => block.Kind == BlockKind.Park).ToArray();
+        Assert.NotEmpty(parks);
+
+        foreach (var park in parks)
+        {
+            Assert.Contains(
+                plan.Props,
+                prop => prop.Kind == PropKind.Tree
+                    && park.Bounds.Contains(new Vec2(prop.Position.X, prop.Position.Z)));
+            Assert.DoesNotContain(
+                plan.Buildings,
+                building => park.Bounds.Contains(new Vec2(building.Centre.X, building.Centre.Z)));
+        }
+    }
+
+    [Fact]
+    public void EveryBuiltBlockHoldsAtLeastOneBuilding()
+    {
+        var plan = TownFixtures.Plan();
+        var built = plan.Blocks.Where(block => block.Kind == BlockKind.Built).ToArray();
+        Assert.NotEmpty(built);
+
+        foreach (var block in built)
+        {
+            Assert.Contains(
+                plan.Buildings,
+                building => block.Bounds.Contains(new Vec2(building.Centre.X, building.Centre.Z)));
+        }
+    }
+
+    [Fact]
+    public void EmptyBlocksHoldNoBuildings()
+    {
+        var plan = TownFixtures.Plan();
+
+        foreach (var block in plan.Blocks.Where(block => block.Kind == BlockKind.Empty))
+        {
+            Assert.DoesNotContain(
+                plan.Buildings,
+                building => block.Bounds.Contains(new Vec2(building.Centre.X, building.Centre.Z)));
+        }
     }
 
     [Fact]
