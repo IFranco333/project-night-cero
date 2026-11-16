@@ -271,6 +271,7 @@ Details and acceptance criteria for each milestone: [`docs/roadmap.md`](docs/roa
 | [Vision](docs/vision.md) | The long-term game and its features |
 | [Design](docs/design.md) | The vertical slice: pillars, loop, balance, systems |
 | [Architecture](docs/architecture.md) | Modules, tick order, determinism and world rules |
+| [Art direction](docs/art-direction.md) | Palette, lighting presets and the procedural sky |
 | [Roadmap](docs/roadmap.md) | Milestones from foundation to release |
 | [ADRs](docs/adr/) | Architecture decision records |
 | [Contributing](CONTRIBUTING.md) | Workflow, standards and definition of done |
