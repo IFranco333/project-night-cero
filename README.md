@@ -4,6 +4,7 @@
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![Godot](https://img.shields.io/badge/Godot-4.x%20(.NET)-478CBF)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
+![coverage](https://img.shields.io/badge/coverage-83%25-brightgreen)
 
 # Noche Cero
 
@@ -177,7 +178,7 @@ On every push and pull request, CI runs the Godot-free guard on the core project
 
 ### Development process
 
-- Short-lived branches (`feature/…`, `fix/…`), merged into `dev`; `main` holds released milestones.
+- Short-lived branches (`feature/…`, `fix/…`, `chore/…`) merged into `main` through a pull request; `main` always stays green and milestones are marked with tags.
 - **Conventional Commits**, atomic and small, each with its tests and documentation.
 - **Test-driven development** for simulation logic: a failing test first, the minimal implementation second, a refactor third.
 - **Architecture Decision Records** in [`docs/adr/`](docs/adr/) capture every decision that is expensive to reverse.

@@ -42,7 +42,7 @@ Opening the game layer: `src/Game/README.md` explains its current status.
 | `chore/<slug>` | tooling, CI, dependencies |
 | `docs/<slug>` | documentation and decisions |
 
-Branch from `dev` and keep branches short-lived. `main` holds released milestones.
+Branch from `main`, keep branches short-lived, and merge them back through a pull request. `main` always stays green; milestones are marked with tags.
 
 ### Commits
 
