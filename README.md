@@ -74,7 +74,7 @@ Every night begins the same way and ends differently. Your job is to make the ne
 | System | Description |
 |---|---|
 | **Cameras** | Third-person by default; smooth first-person aim for precise shooting |
-| **World** | A procedurally generated and hand-authored town (~1 km²) with interiors, a hospital, a forested edge, and a 3-level catacomb |
+| **World** | A procedurally generated town (~1 km²) of houses, mansions, shops, warehouses, garages, a church, a police station and a hospital, all with interiors, plus parks, woods and empty lots. Houses and mansions can have cellars, and one house hides the entrance to a 3-level catacomb |
 | **Zombies** | Individual behavior plus horde alerting: vision cones, line of sight, hearing, investigation, chase, attack |
 | **Hostile community** | A human district with advanced AI: patrol routes, cover, flanking, traps, ambushes, retreat, reinforcements and shared memory. There is no separate "combat mode" — entering their territory in force is simply where organized humans dominate |
 | **Stealth** | Crouching, cover, noise generation and darkness interact with all agents' perception |
@@ -83,13 +83,13 @@ Every night begins the same way and ends differently. Your job is to make the ne
 | **Progression** | XP and skills (aim, stealth, survival, strength), a day counter starting at "Night 0" |
 | **Items and loot** | Data-driven, tiered loot with rarity and durability, generated per container from the world seed |
 | **Vehicles** | A drivable car with fuel, battery and damage |
-| **Atmosphere** | Day/night cycle, stealth-relevant lighting, darkness-driven threats |
+| **Atmosphere** | Night sky with drifting cloud, stars and a moon; selectable lighting moods (night, overcast, dusk); day/night cycle, stealth-relevant lighting and darkness-driven threats |
 
 The full long-term scope — larger regions, more communities, new threats, crafting, a complete skill tree — is described in the [vision document](docs/vision.md). The [design document](docs/design.md) describes the vertical slice under construction.
 
 ## Current status
 
-> **World stage (S1).** The engine-free core is in place: a deterministic fixed-tick loop, an entity–component world with deferred structural changes, seeded RNG with golden tests, a state hash, a headless CLI runner, player movement and third-person camera math. World generation now produces a seeded town — a road grid, buildings with interiors and static props — plus a navigation graph with A* and path smoothing. **There is no playable build yet** — the Godot scene shell is the remaining S0 item and needs the Godot .NET editor.
+> **World stage (S1).** The engine-free core is in place: a deterministic fixed-tick loop, an entity–component world with deferred structural changes, seeded RNG with golden tests, a state hash, a headless CLI runner, player movement and third-person camera math. World generation produces a seeded town — a road grid, blocks that are built, park, wood or empty, buildings with interiors and landmarks, cellars and a catacomb entrance, and static props — plus a navigation graph with A* and path smoothing. The Godot layer draws that town with instanced meshes under a procedural night sky and lets you walk it in third or first person. **There is no gameplay yet**: no threats, loot or survival stats.
 
 The project is developed in the open, with every feature shipped together with its tests and documentation.
 
