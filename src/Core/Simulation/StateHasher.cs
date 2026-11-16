@@ -78,6 +78,19 @@ public static class StateHasher
             case Entity entity:
                 text.Append(entity.Value.ToString(CultureInfo.InvariantCulture));
                 return;
+            case bool flag:
+                text.Append(flag ? '1' : '0');
+                return;
+            case string text2:
+                text.Append(text2);
+                return;
+            case Enum enumValue:
+                text.Append(Convert.ToInt64(enumValue, CultureInfo.InvariantCulture)
+                    .ToString(CultureInfo.InvariantCulture));
+                return;
+            case byte or sbyte or short or ushort or int or uint or long or ulong:
+                text.Append(Convert.ToString(value, CultureInfo.InvariantCulture));
+                return;
         }
 
         // Value-type records: write the readable value, then the public fields in name order.
