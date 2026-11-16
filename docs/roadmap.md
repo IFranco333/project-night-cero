@@ -28,18 +28,18 @@ Status detail and lessons: [`docs/sprints/sprint-0.md`](sprints/sprint-0.md).
 - [x] Block kinds (built, park, wood, empty lot) plus road markings, sidewalks and park paths
 - [x] Landmarks (church, hospital, police), cellars and exactly one catacomb entrance
 - [x] Godot town view: palette, lighting presets and a procedural night sky (cloud, stars, moon)
-- [ ] Camera visibility, explored-map fog
-- [ ] Noche Cero opening scene (wake in bed) — needs the Godot editor
+- [ ] Camera visibility, explored-map fog ([#9](https://github.com/IFranco333/project-night-cero/issues/9))
+- [ ] Noche Cero opening scene (wake in bed) — needs the Godot editor ([#10](https://github.com/IFranco333/project-night-cero/issues/10))
 
 Status detail and lessons: [`docs/sprints/sprint-1.md`](sprints/sprint-1.md).
 
 ## S2 — Player, equipment, combat
 - Player controller: third-person movement, first-person aim toggle
-- Survival stats: hunger, thirst, stamina, wounds (cuts/fractures), bleeding, splints
-- Inventory (weight, stacking, equip), loot containers, food heals
-- Weapons: melee (axe/sword/bat/pipe), bow with arrow recovery, firearms by tier
+- Survival stats: hunger, thirst, stamina, wounds (cuts/fractures), bleeding, splints ([#11](https://github.com/IFranco333/project-night-cero/issues/11))
+- Inventory (weight, stacking, equip), loot containers, food heals ([#12](https://github.com/IFranco333/project-night-cero/issues/12))
+- Weapons: melee (axe/sword/bat/pipe), bow with arrow recovery, firearms by tier ([#13](https://github.com/IFranco333/project-night-cero/issues/13))
 - HUD and minimal menus
-- Main menu replacing the placeholder title screen: settings (graphics, audio, controls, language), new game with seed selection and **character creation**
+- Main menu replacing the placeholder title screen: settings (graphics, audio, controls, language), new game with seed selection and **character creation** ([#14](https://github.com/IFranco333/project-night-cero/issues/14))
 
 ## S3 — Threats and stealth
 - Zombie AI: perception, investigate/chase/attack, horde alerting
