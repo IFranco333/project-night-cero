@@ -46,12 +46,20 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         shell: bash
         run: |
-          file=$(find coverage -name 'coverage.cobertura.xml' | head -1)
+          # Read the root line-rate without piping into head: with `-o pipefail`, grep dies of
+          # SIGPIPE as soon as head exits, and the step fails once the report is large enough.
+          file=$(find coverage -name 'coverage.cobertura.xml' -print -quit)
           if [ -z "$file" ]; then
             echo "::warning::no coverage file found"
             exit 0
           fi
-          rate=$(grep -o 'line-rate="[0-9.]*"' "$file" | head -1 | cut -d'"' -f2)
+          content=$(<"$file")
+          if [[ $content =~ line-rate=\"([0-9.]+)\" ]]; then
+            rate=${BASH_REMATCH[1]}
+          else
+            echo "::warning::no line-rate attribute in $file"
+            exit 0
+          fi
           pct=$(awk "BEGIN { printf \"%.1f\", $rate * 100 }")
           echo "Line coverage: **$pct%**" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload coverage

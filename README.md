@@ -4,7 +4,7 @@
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![Godot](https://img.shields.io/badge/Godot-4.x%20(.NET)-478CBF)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
-![coverage](https://img.shields.io/badge/coverage-83%25-brightgreen)
+![coverage](https://img.shields.io/badge/coverage-88%25-brightgreen)
 
 # Noche Cero
 
