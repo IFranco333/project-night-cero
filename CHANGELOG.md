@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deterministic replay: `InputLog` records one intent per tick and `Simulation.Run(InputLog)`
   reproduces the session hash-for-hash.
 - `--bench` mode in the runner for tick-throughput measurements.
+- CI reports line coverage in the job summary; the README shows a coverage badge.
 - Sprint 0 retro in `docs/sprints/sprint-0.md`.
 
 ### Changed
