@@ -61,7 +61,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   features (trees in woods, basements, catacomb entrance).
 - Title screen (`Scenes/TitleScreen.cs`): the town drifts behind it while the camera orbits, with
   the seed, the project version and the lighting preset on show. Any key or click starts the game.
-  `--title` keeps it up, so `--screenshot=… --title` captures the title reproducibly.
+  `--title` keeps it up, so `--screenshot=… --title` captures the title reproducibly. The title
+  reads **NIGHT ZERO** (the English form of the working title) in two tones, with a rule and a
+  shadow so it holds over the lit town.
 - CI job `game`: builds the Godot project on Linux with no editor and no Godot binary — the C#
   layer compiles against `Godot.NET.Sdk` from NuGet, which catches a broken Game-layer build
   before a human runs it.
@@ -74,6 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `InternalsVisibleTo` names the real test assembly, so tests can build small graphs and worlds.
 - The town golden hash was repinned: the plan gained block kinds, features and woods, which by
   design changes the canonical text and therefore the hash (ADR 0002).
+- *Noche Cero* / *Night Zero* is documented as a working title that may change. The title screen is
+  a placeholder for a future main menu with settings and character creation.
 
 ## [0.0.0] - 2026-11-11
 
