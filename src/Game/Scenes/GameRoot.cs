@@ -8,7 +8,6 @@ using NightCero.Core.WorldGen;
 using NightCero.Core.WorldModel;
 using NightCero.Game.Player;
 using NightCero.Game.Rendering;
-using GodotEnvironment = Godot.Environment;
 
 namespace NightCero.Game;
 
@@ -39,10 +38,12 @@ public partial class GameRoot : Node3D
     private Simulation _simulation = null!;
     private TownPlan _plan = null!;
     private PlayerController _player = null!;
+    private Node3D _lighting = null!;
     private Label _hud = null!;
     private Label _crosshair = null!;
     private string? _screenshotPath;
     private bool _shadows = true;
+    private Mood _mood = Mood.Night;
     private float? _yaw;
     private float? _pitch;
     private float? _distance;
@@ -67,8 +68,8 @@ public partial class GameRoot : Node3D
         AddChild(world);
         world.Build(_plan);
 
-        AddChild(NightEnvironment());
-        AddChild(Moonlight());
+        _lighting = Lighting();
+        AddChild(_lighting);
 
         _player = new PlayerController { Name = "Player", Position = ToGodot(SpawnPoint()) };
         AddChild(_player);
@@ -119,36 +120,36 @@ public partial class GameRoot : Node3D
         {
             _hud.Visible = !_hud.Visible;
         }
+
+        if (@event.IsActionPressed("cycle_mood"))
+        {
+            SetMood(Mood.Next(_mood.Name));
+        }
     }
 
     // ---- Scene setup ---------------------------------------------------------------------
 
-    private static WorldEnvironment NightEnvironment()
+    private void SetMood(Mood mood)
     {
-        var environment = new GodotEnvironment
-        {
-            BackgroundMode = GodotEnvironment.BGMode.Color,
-            BackgroundColor = new Color(0.03f, 0.04f, 0.06f),
-            AmbientLightSource = GodotEnvironment.AmbientSource.Color,
-            AmbientLightColor = new Color(0.24f, 0.28f, 0.36f),
-            AmbientLightEnergy = 1.15f,
-            TonemapMode = GodotEnvironment.ToneMapper.Filmic,
-            FogEnabled = true,
-            FogLightColor = new Color(0.07f, 0.08f, 0.12f),
-            FogDensity = 0.0022f,
-        };
-
-        return new WorldEnvironment { Name = "Night", Environment = environment };
+        _mood = mood;
+        RemoveChild(_lighting);
+        _lighting.QueueFree();
+        _lighting = Lighting();
+        AddChild(_lighting);
+        GD.Print($"mood {mood.Name}");
     }
 
-    private DirectionalLight3D Moonlight() => new()
+    /// <summary>
+    /// Sky, fog and key light for the current <see cref="Mood"/>. Both are parented to a plain node
+    /// so the pair can be swapped without touching the town.
+    /// </summary>
+    private Node3D Lighting()
     {
-        Name = "Moonlight",
-        LightColor = new Color(0.55f, 0.65f, 0.9f),
-        LightEnergy = 0.85f,
-        ShadowEnabled = _shadows,
-        RotationDegrees = new Vector3(-55, 35, 0),
-    };
+        var group = new Node3D { Name = "Lighting" };
+        group.AddChild(new WorldEnvironment { Name = "Environment", Environment = _mood.BuildEnvironment() });
+        group.AddChild(_mood.BuildKeyLight(_shadows));
+        return group;
+    }
 
     private void BuildHud()
     {
@@ -187,9 +188,9 @@ public partial class GameRoot : Node3D
     private void UpdateHud(Transform transform)
     {
         _hud.Text =
-            $"seed {Seed}  {_player.Mode}  mode {(_player.Aiming ? "aim" : "walk")}  "
+            $"seed {Seed}  {_mood.Name}  {_player.Mode}  mode {(_player.Aiming ? "aim" : "walk")}  "
             + $"tick {_simulation.Tick}  pos {transform.Position.X:0.0}, {transform.Position.Z:0.0}  "
-            + $"fps {Engine.GetFramesPerSecond():0}  [V] camera  [H] hide";
+            + $"fps {Engine.GetFramesPerSecond():0}  [V] camera  [M] mood  [H] hide";
 
         _crosshair.Visible = _player.Mode == CameraMode.First || _player.Aiming;
     }
@@ -222,6 +223,18 @@ public partial class GameRoot : Node3D
             else if (argument.StartsWith("--distance=", StringComparison.Ordinal))
             {
                 _distance = ParseFloat(argument[11..]);
+            }
+            else if (argument.StartsWith("--mood=", StringComparison.Ordinal))
+            {
+                var mood = Mood.For(argument[7..]);
+                if (mood is null)
+                {
+                    GD.PushWarning($"unknown mood '{argument[7..]}'; use night, overcast or dusk");
+                }
+                else
+                {
+                    _mood = mood;
+                }
             }
             else if (argument.StartsWith("--screenshot=", StringComparison.Ordinal))
             {
