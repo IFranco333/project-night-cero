@@ -78,6 +78,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   design changes the canonical text and therefore the hash (ADR 0002).
 - *Noche Cero* / *Night Zero* is documented as a working title that may change. The title screen is
   a placeholder for a future main menu with settings and character creation.
+- The README, the design document, the art-direction document and the Game README now state up
+  front that the art is placeholder: untextured boxes, no models, textures, animations or audio.
+  The README's runner examples were refreshed to the current output.
 
 ## [0.0.0] - 2026-11-11
 

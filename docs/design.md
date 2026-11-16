@@ -2,6 +2,8 @@
 
 Living design document. Gameplay constants live in the engine-free core (for example `src/Core/Player/MoveIntent.cs`) and are mirrored here in the same commit. Full-game north star: `docs/vision.md`.
 
+> **Prototype.** The build is a grey-box prototype: every mesh is an untextured box and there are no models, textures, animations, characters or audio. The intended look is in [art-direction.md](art-direction.md); no screenshot of this stage is the final look.
+
 ## One-liner
 *Noche Cero*: you wake up to the screams of your city on the night the apocalypse begins. Survive the infected, the darkness underneath, and the people who locked themselves in.
 
