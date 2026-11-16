@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Godot;
 using NightCero.Core.Math;
 using NightCero.Core.WorldGen;
@@ -19,8 +21,13 @@ public partial class WorldRenderer : Node3D
     /// <summary>Height of one floor in metres, used to give each building its volume.</summary>
     public const float FloorHeight = 3.2f;
 
-    private static readonly Color GroundColor = new(0.10f, 0.105f, 0.11f);
-    private static readonly Color RoadColor = new(0.16f, 0.16f, 0.175f);
+    private static readonly Color GroundColor = new(0.08f, 0.085f, 0.09f);
+    private static readonly Color RoadColor = new(0.15f, 0.15f, 0.165f);
+    private static readonly Color SidewalkColor = new(0.27f, 0.27f, 0.275f);
+    private static readonly Color GrassColor = new(0.10f, 0.18f, 0.10f);
+    private static readonly Color DirtColor = new(0.16f, 0.13f, 0.10f);
+    private static readonly Color ParkPathColor = new(0.30f, 0.28f, 0.25f);
+    private static readonly Color DoorColor = new(0.035f, 0.035f, 0.04f);
     private static readonly Color TrunkColor = new(0.14f, 0.11f, 0.08f);
     private static readonly Color CanopyColor = new(0.12f, 0.20f, 0.13f);
     private static readonly Color BenchColor = new(0.26f, 0.20f, 0.14f);
@@ -47,7 +54,10 @@ public partial class WorldRenderer : Node3D
 
         AddChild(Ground(plan));
         AddChild(Roads(plan));
+        AddChild(Blocks(plan));
+        AddChild(ParkPaths(plan));
         AddChild(Buildings(plan));
+        AddChild(Doors(plan));
         AddProps(plan);
     }
 
@@ -77,6 +87,83 @@ public partial class WorldRenderer : Node3D
         return Wrap("Roads", multimesh);
     }
 
+    // ---- Blocks: sidewalks, grass and empty lots -----------------------------------------
+
+    /// <summary>Width of the sidewalk ring around a built block, in metres.</summary>
+    private const float SidewalkWidth = 2f;
+
+    /// <summary>
+    /// The ground of every block. A built block gets a grass interior with a sidewalk ring around
+    /// it, so the 15 cm step at the ring's outer edge reads as a curb; a park is grass with paths;
+    /// an empty lot is bare ground.
+    /// </summary>
+    private static MultiMeshInstance3D Blocks(TownPlan plan)
+    {
+        var slabs = new List<(Vec3 Position, Vector3 Size, Color Color)>();
+
+        foreach (var block in plan.Blocks)
+        {
+            var bounds = block.Bounds;
+            var centre = new Vec3(bounds.Centre.X, 0, bounds.Centre.Y);
+
+            switch (block.Kind)
+            {
+                case BlockKind.Park:
+                    slabs.Add((centre, new Vector3(bounds.Width, 0.12f, bounds.Height), GrassColor));
+                    break;
+
+                case BlockKind.Empty:
+                    slabs.Add((centre, new Vector3(bounds.Width, 0.10f, bounds.Height), DirtColor));
+                    break;
+
+                default:
+                    var inner = bounds.Expand(-SidewalkWidth);
+                    slabs.Add((
+                        new Vec3(inner.Centre.X, 0, inner.Centre.Y),
+                        new Vector3(inner.Width, 0.10f, inner.Height),
+                        GrassColor));
+
+                    var half = SidewalkWidth / 2f;
+                    var ring = new Vector3(bounds.Width, 0.15f, SidewalkWidth);
+                    var side = new Vector3(SidewalkWidth, 0.15f, bounds.Height - (SidewalkWidth * 2f));
+                    slabs.Add((new Vec3(bounds.Centre.X, 0, bounds.MinY + half), ring, SidewalkColor));
+                    slabs.Add((new Vec3(bounds.Centre.X, 0, bounds.MaxY - half), ring, SidewalkColor));
+                    slabs.Add((new Vec3(bounds.MinX + half, 0, bounds.Centre.Y), side, SidewalkColor));
+                    slabs.Add((new Vec3(bounds.MaxX - half, 0, bounds.Centre.Y), side, SidewalkColor));
+                    break;
+            }
+        }
+
+        var multimesh = Instanced(new BoxMesh { Size = Vector3.One }, slabs.Count, Colors.White);
+        for (var i = 0; i < slabs.Count; i++)
+        {
+            var (position, size, color) = slabs[i];
+            multimesh.SetInstanceTransform(
+                i,
+                Place(position + new Vec3(0, size.Y / 2f, 0), size));
+            multimesh.SetInstanceColor(i, color);
+        }
+
+        return Wrap("Blocks", multimesh);
+    }
+
+    /// <summary>Two crossing paths through the middle of every park.</summary>
+    private static MultiMeshInstance3D ParkPaths(TownPlan plan)
+    {
+        var parks = plan.Blocks.Where(block => block.Kind == BlockKind.Park).ToArray();
+        var multimesh = Instanced(new BoxMesh { Size = Vector3.One }, parks.Length * 2, ParkPathColor);
+
+        for (var i = 0; i < parks.Length; i++)
+        {
+            var bounds = parks[i].Bounds;
+            var centre = new Vec3(bounds.Centre.X, 0.15f, bounds.Centre.Y);
+            multimesh.SetInstanceTransform(i * 2, Place(centre, new Vector3(bounds.Width, 0.06f, 1.6f)));
+            multimesh.SetInstanceTransform((i * 2) + 1, Place(centre, new Vector3(1.6f, 0.06f, bounds.Height)));
+        }
+
+        return Wrap("ParkPaths", multimesh);
+    }
+
     // ---- Buildings -----------------------------------------------------------------------
 
     private static MultiMeshInstance3D Buildings(TownPlan plan)
@@ -95,6 +182,54 @@ public partial class WorldRenderer : Node3D
         }
 
         return Wrap("Buildings", multimesh);
+    }
+
+    /// <summary>
+    /// A dark slab on the wall at each entrance. The generator already places the door on the side
+    /// that faces the street, so the renderer only has to work out which wall it is on.
+    /// </summary>
+    private static MultiMeshInstance3D Doors(TownPlan plan)
+    {
+        var multimesh = Instanced(new BoxMesh { Size = Vector3.One }, plan.Buildings.Count, DoorColor);
+
+        for (var i = 0; i < plan.Buildings.Count; i++)
+        {
+            var building = plan.Buildings[i];
+            var footprint = building.Footprint;
+            var entrance = building.Entrance;
+            const float halfWidth = 0.7f;
+            const float height = 2.2f;
+            const float thickness = 0.25f;
+            const float lift = 0.15f;
+
+            Vector3 size;
+            Vec3 position;
+
+            if (MathF.Abs(entrance.Z - footprint.MinY) < 0.01f)
+            {
+                size = new Vector3(halfWidth * 2f, height, thickness);
+                position = new Vec3(entrance.X, lift + (height / 2f), footprint.MinY - (thickness / 2f));
+            }
+            else if (MathF.Abs(entrance.Z - footprint.MaxY) < 0.01f)
+            {
+                size = new Vector3(halfWidth * 2f, height, thickness);
+                position = new Vec3(entrance.X, lift + (height / 2f), footprint.MaxY + (thickness / 2f));
+            }
+            else if (MathF.Abs(entrance.X - footprint.MinX) < 0.01f)
+            {
+                size = new Vector3(thickness, height, halfWidth * 2f);
+                position = new Vec3(footprint.MinX - (thickness / 2f), lift + (height / 2f), entrance.Z);
+            }
+            else
+            {
+                size = new Vector3(thickness, height, halfWidth * 2f);
+                position = new Vec3(footprint.MaxX + (thickness / 2f), lift + (height / 2f), entrance.Z);
+            }
+
+            multimesh.SetInstanceTransform(i, Place(position, size));
+        }
+
+        return Wrap("Doors", multimesh);
     }
 
     private static Color ColorFor(BuildingKind kind) => kind switch

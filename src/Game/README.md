@@ -39,6 +39,7 @@ Arguments after `--` go to the game and not to the engine:
 | `--seed=1234` | generate a different town |
 | `--no-shadows` | disable shadows (much faster on weak GPUs) |
 | `--screenshot=path.png` | render a few frames, save a PNG and quit — used to check the town headlessly |
+| `--yaw=45` `--pitch=35` `--distance=30` | start the camera at a fixed orbit, for inspection shots |
 
 ## Rules for this layer
 

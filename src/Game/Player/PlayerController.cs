@@ -58,6 +58,20 @@ public partial class PlayerController : Node3D
     /// <summary>Horizontal angle in degrees, clockwise from north.</summary>
     public float Yaw => _yaw;
 
+    /// <summary>
+    /// Orbit radius to use instead of the walking one. Set from the command line so inspection
+    /// screenshots can look at the town from above without changing the gameplay values.
+    /// </summary>
+    public float? DistanceOverride { get; set; }
+
+    /// <summary>Sets the orbit angles, for inspection screenshots.</summary>
+    public void SetPose(float yawDegrees, float pitchDegrees, float distance)
+    {
+        _yaw = yawDegrees;
+        _pitch = Mathf.Clamp(pitchDegrees, -80f, 80f);
+        DistanceOverride = distance;
+    }
+
     public override void _Ready()
     {
         Camera = new Camera3D
@@ -145,7 +159,7 @@ public partial class PlayerController : Node3D
         }
         else
         {
-            var distance = Aiming ? AimDistance : ThirdPersonDistance;
+            var distance = DistanceOverride ?? (Aiming ? AimDistance : ThirdPersonDistance);
             var pose = ThirdPersonRig.Evaluate(feet, _yaw, _pitch, distance);
             var shoulder = Aiming ? Right(_yaw) * ShoulderOffset : Vector3.Zero;
             desiredPosition = ToGodot(pose.Position) + shoulder;

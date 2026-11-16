@@ -43,6 +43,9 @@ public partial class GameRoot : Node3D
     private Label _crosshair = null!;
     private string? _screenshotPath;
     private bool _shadows = true;
+    private float? _yaw;
+    private float? _pitch;
+    private float? _distance;
     private double _accumulator;
     private int _frames;
 
@@ -69,6 +72,11 @@ public partial class GameRoot : Node3D
 
         _player = new PlayerController { Name = "Player", Position = ToGodot(SpawnPoint()) };
         AddChild(_player);
+
+        if (_pitch is not null || _distance is not null || _yaw is not null)
+        {
+            _player.SetPose(_yaw ?? 0f, _pitch ?? 14f, _distance ?? PlayerController.ThirdPersonDistance);
+        }
 
         BuildHud();
 
@@ -203,6 +211,18 @@ public partial class GameRoot : Node3D
             {
                 _shadows = false;
             }
+            else if (argument.StartsWith("--yaw=", StringComparison.Ordinal))
+            {
+                _yaw = ParseFloat(argument[6..]);
+            }
+            else if (argument.StartsWith("--pitch=", StringComparison.Ordinal))
+            {
+                _pitch = ParseFloat(argument[8..]);
+            }
+            else if (argument.StartsWith("--distance=", StringComparison.Ordinal))
+            {
+                _distance = ParseFloat(argument[11..]);
+            }
             else if (argument.StartsWith("--screenshot=", StringComparison.Ordinal))
             {
                 var path = argument[13..];
@@ -212,6 +232,11 @@ public partial class GameRoot : Node3D
             }
         }
     }
+
+    private static float? ParseFloat(string text) =>
+        float.TryParse(text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var value)
+            ? value
+            : null;
 
     /// <summary>The centre of the town snapped to a road crossing, so the player starts on asphalt.</summary>
     private Vec3 SpawnPoint()
