@@ -34,7 +34,8 @@ Wake up in your house → gear up (flashlight, weapon) → explore the town and 
 The town is generated from the save seed, never hand-placed:
 
 - A 1024 × 1024 m rectangle of 16 × 16 blocks, separated by 8 m roads; each block holds up to four buildings.
-- About 10 % of blocks are parks and 6 % are empty lots; the rest are built.
+- About 10 % of blocks are parks and 6 % are empty lots; the rest are built. The plan records the kind of every block, so the renderer can draw grass, bare ground or a sidewalk without guessing.
+- A built block is a grass interior with a 2 m sidewalk ring around it; the 15 cm step at the ring's outer edge is the curb. Parks get a path across them.
 - The church and the hospital are unique: the generator gives each one to a landmark building, so a town has exactly one of each.
 - Every building has a door on the street side and an interior split into rooms; containers and loot spawn per room in S2.
 - Buildings never overlap, every door is reachable from the road graph, and the same seed always produces the same town (pinned by a golden hash in the tests).

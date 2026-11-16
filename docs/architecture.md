@@ -101,9 +101,13 @@ The Godot project lives in `src/Game` and is deliberately thin: it reads a `Town
 - `Scenes/GameRoot.cs` generates the town for the seed, spawns it into the simulation, owns the
   fixed-tick accumulator and drives the player. It is the only place that knows both layers.
 - `Rendering/WorldRenderer.cs` turns the plan into instanced boxes: one `MultiMeshInstance3D` per
-  material (ground, roads, buildings, trees, cars, streetlights, benches, dumpsters). A 724-building
-  town is a handful of draw calls, and swapping boxes for prefab scenes later does not touch the
-  generator.
+  material (ground, roads, block slabs, park paths, buildings, doors, trees, cars, streetlights,
+  benches, dumpsters). A 724-building town is a handful of draw calls, and swapping boxes for
+  prefab scenes later does not touch the generator.
+- Block slabs come from `TownPlan.Blocks`: a built block is a grass interior plus a 2 m sidewalk
+  ring (the 15 cm step is the curb), a park is grass with a path across it, an empty lot is bare
+  ground. Doors are drawn from `Building.Entrance`, which the generator already places on the wall
+  that faces the street.
 - `Player/PlayerController.cs` converts input into a `MoveIntent` and applies the pose from
   `ThirdPersonRig` to a `Camera3D`. Both camera modes are fully playable: third person walks and
   aims in third person, first person walks and aims in first person, and `V` switches at any time.

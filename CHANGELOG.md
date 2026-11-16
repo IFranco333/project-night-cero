@@ -38,8 +38,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   town costs a handful of draw calls.
 - `PlayerController` with two fully playable camera modes (third person and first person, each with
   its own aim behaviour) and a `V` toggle at any time.
-- `--seed`, `--no-shadows` and `--screenshot` arguments for inspecting the town without a human
-  watching.
+- `--seed`, `--no-shadows`, `--screenshot`, `--yaw`, `--pitch` and `--distance` arguments for
+  inspecting the town without a human watching.
+- Town blocks (`Block`, `BlockKind`): the plan now records whether each block is built, a park or an
+  empty lot, and `CanonicalText` covers them. The renderer draws grass, bare ground, a 2 m sidewalk
+  ring with a curb, park paths and building doors from that data.
 
 ### Changed
 
