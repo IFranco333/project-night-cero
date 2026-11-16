@@ -89,7 +89,7 @@ The full long-term scope — larger regions, more communities, new threats, craf
 
 ## Current status
 
-> **Foundation stage (S0).** The engine-free core is in place: a deterministic fixed-tick loop, an entity–component world with deferred structural changes, seeded RNG with golden tests, a state hash, a headless CLI runner, player movement and third-person camera math. **There is no playable build yet** — the Godot scene shell is the remaining S0 item and needs the Godot .NET editor.
+> **World stage (S1).** The engine-free core is in place: a deterministic fixed-tick loop, an entity–component world with deferred structural changes, seeded RNG with golden tests, a state hash, a headless CLI runner, player movement and third-person camera math. World generation now produces a seeded town — a road grid, buildings with interiors and static props — plus a navigation graph with A* and path smoothing. **There is no playable build yet** — the Godot scene shell is the remaining S0 item and needs the Godot .NET editor.
 
 The project is developed in the open, with every feature shipped together with its tests and documentation.
 
@@ -171,6 +171,7 @@ See [ADR 0002](docs/adr/0002-deterministic-core.md).
 - **Unit and integration tests** cover perception, navigation, combat, injuries, inventory, loot and save round-trips.
 - **Property-based tests** assert invariants (paths are contiguous and unobstructed, inventories never exceed capacity, save→load→save is lossless).
 - **Replay tests** compare the state hash of a seeded session against a golden value.
+- **Golden world tests** pin the generated town for a seed, and invariant tests assert that buildings never overlap, every entrance sits on its wall and every room is reachable from the road network.
 - **Save fuzzing** ensures corrupted or malicious save files fail cleanly with typed errors.
 - **Balance simulations** run batches of seeded games headless to compare survival statistics between versions.
 
@@ -205,6 +206,16 @@ dotnet run --project src/Runner -- --seed 2026 --ticks 250 --bodies 8
 ```
 
 The same seed and tick count always print the same hash — that is the determinism guarantee in action.
+
+Generate the town for a seed and route between two building entrances:
+
+```bash
+dotnet run --project src/Runner -- --seed 2026 --ticks 0 --town --nav
+# town     724 buildings, 462 props, 34 roads
+# townhash c8563165bf2ba905
+# nav      3555 nodes, 1921 on roads
+# path     125 nodes, 19 waypoints, 1966.7 m
+```
 
 Measure tick throughput (timing lives in the runner, not the deterministic core):
 
@@ -245,7 +256,7 @@ The Godot project lives in `src/Game/` and is added in milestone S0. Until then 
 | Milestone | Goal | Status |
 |---|---|---|
 | **S0 — Foundations** | Solution, ECS, deterministic RNG, headless runner, player movement, camera math, Godot scene shell, "Noche Cero" title screen | 🟡 in progress (engine-free core done; Godot shell pending) |
-| **S1 — World, navigation, opening** | Town generator, nav graph, visibility, opening scene | ⬜ planned |
+| **S1 — World, navigation, opening** | Town generator, nav graph, visibility, opening scene | 🟡 in progress (town generation, content catalog and navigation done; visibility and opening scene pending) |
 | **S2 — Player, equipment, combat** | Movement, cameras, survival stats, injuries, weapons, inventory, HUD | ⬜ planned |
 | **S3 — Threats and stealth** | Zombie AI, hostile community AI, stealth, catacomb | ⬜ planned |
 | **S4 — Vehicles, progression, atmosphere** | Car, XP/skills, day counter, hospital, first full night | ⬜ planned |
