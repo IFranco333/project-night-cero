@@ -41,6 +41,7 @@ public static class Program
             var plan = TownGenerator.Generate(options.Seed, TownSettings.Default, BuildingCatalog.All);
             TownSpawner.Spawn(simulation.World, plan);
             Console.WriteLine($"town     {plan.Buildings.Count} buildings, {plan.Props.Count} props, {plan.Roads.Count} roads");
+            PrintTownBreakdown(plan);
             Console.WriteLine($"townhash {plan.Hash():x16}");
 
             if (options.Nav)
@@ -121,6 +122,46 @@ public static class Program
             (from, to) => TownGeometry.IsSegmentClear(plan, from, to, radius: 0.4f));
         Console.WriteLine(
             $"path     {path.Count} nodes, {waypoints.Count} waypoints, {AStar.PathCost(graph, path):F1} m");
+    }
+
+    /// <summary>
+    /// Prints what the plan actually holds: block kinds, building kinds, the props, and the cellar
+    /// and catacomb features. The hash proves the plan is reproducible; this tells a human whether
+    /// it is the plan they meant to generate.
+    /// </summary>
+    private static void PrintTownBreakdown(TownPlan plan)
+    {
+        var blocks = string.Join(
+            ", ",
+            Enum.GetValues<BlockKind>().Select(kind => $"{kind} {plan.Blocks.Count(block => block.Kind == kind)}"));
+        Console.WriteLine($"blocks   {blocks}");
+
+        var kinds = string.Join(
+            ", ",
+            Enum.GetValues<BuildingKind>()
+                .Select(kind => (kind, count: plan.Buildings.Count(building => building.Kind == kind)))
+                .Where(entry => entry.count > 0)
+                .Select(entry => $"{entry.kind} {entry.count}"));
+        Console.WriteLine($"kinds    {kinds}");
+
+        var props = string.Join(
+            ", ",
+            plan.Props
+                .GroupBy(prop => prop.Kind)
+                .OrderBy(group => group.Key)
+                .Select(group => $"{group.Key} {group.Count()}"));
+        Console.WriteLine($"propmix  {props}");
+
+        var woods = plan.Blocks.Where(block => block.Kind == BlockKind.Forest).ToArray();
+        var woodsTrees = plan.Props.Count(prop =>
+            prop.Kind == PropKind.Tree
+            && woods.Any(block => block.Bounds.Contains(new Vec2(prop.Position.X, prop.Position.Z))));
+        var basements = plan.Buildings.Count(building => building.HasBasement);
+        var catacomb = plan.Buildings.FirstOrDefault(building => building.CatacombEntrance);
+        var entrance = catacomb.CatacombEntrance
+            ? $"catacomb entrance under {catacomb.Kind} #{catacomb.Id}"
+            : "no catacomb entrance";
+        Console.WriteLine($"features {woodsTrees} trees in {woods.Length} woods, {basements} basements, {entrance}");
     }
 
     /// <summary>Bodies with a transform and a movement intent, so the benchmark exercises the ECS.</summary>

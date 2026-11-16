@@ -11,7 +11,7 @@ Goal: solution builds, deterministic core skeleton tested, Godot opens a scene.
 - [x] 3D world model: chunks, transforms
 - [x] Headless sim runner + state hash
 - [x] Player movement system (intent → transform) and third-person camera math
-- [ ] Godot scene: ground, instanced boxes, third-person camera, WASD movement demo
+- [x] Godot scene: ground, instanced boxes, third-person camera, WASD movement demo
 - [ ] "Noche Cero" title screen
 - [ ] Godot headless build job in CI
 - [x] ADRs 0001–0003 accepted
@@ -23,6 +23,9 @@ Status detail and lessons: [`docs/sprints/sprint-0.md`](sprints/sprint-0.md).
 - [x] Content: typed building catalog validated at boot (JSON modding later)
 - [x] Nav graph + A* with string-pulled smoothing
 - [x] Invariant tests: buildings never overlap, every door reachable, golden town hash per seed
+- [x] Block kinds (built, park, wood, empty lot) plus road markings, sidewalks and park paths
+- [x] Landmarks (church, hospital, police), cellars and exactly one catacomb entrance
+- [x] Godot town view: palette, lighting presets and a procedural night sky (cloud, stars, moon)
 - [ ] Camera visibility, explored-map fog
 - [ ] Noche Cero opening scene (wake in bed) — needs the Godot editor
 
@@ -46,6 +49,7 @@ Status detail and lessons: [`docs/sprints/sprint-1.md`](sprints/sprint-1.md).
 - One drivable car (fuel, battery, collision, damage)
 - XP/skills (aim, stealth, survival, strength); day counter
 - Day/night cycle and ambience
+- Weather: rain and snow (the sky and mood system already host a weather pass)
 - Hospital interior + medical loot; hostile district layout
 - Win/lose flow and first full night
 

@@ -20,6 +20,7 @@ public sealed record TownPlan(
     int BlockPitch,
     int RoadWidth,
     IReadOnlyList<RoadSegment> Roads,
+    IReadOnlyList<Block> Blocks,
     IReadOnlyList<Building> Buildings,
     IReadOnlyList<Prop> Props)
 {
@@ -42,6 +43,14 @@ public sealed record TownPlan(
                 .Append(" w=").Append(Number(road.Width)).Append('\n');
         }
 
+        foreach (var block in Blocks)
+        {
+            text.Append("block ").Append(block.Kind)
+                .Append(" min=").Append(Format(new Vec3(block.Bounds.MinX, 0, block.Bounds.MinY)))
+                .Append(" max=").Append(Format(new Vec3(block.Bounds.MaxX, 0, block.Bounds.MaxY)))
+                .Append('\n');
+        }
+
         foreach (var building in Buildings)
         {
             text.Append("building ").Append(building.Id.ToString(CultureInfo.InvariantCulture))
@@ -49,7 +58,10 @@ public sealed record TownPlan(
                 .Append(" c=").Append(Format(building.Centre))
                 .Append(" size=").Append(Number(building.Width)).Append('x').Append(Number(building.Depth))
                 .Append(" floors=").Append(building.Floors.ToString(CultureInfo.InvariantCulture))
-                .Append(" entrance=").Append(Format(building.Entrance)).Append('\n');
+                .Append(" entrance=").Append(Format(building.Entrance))
+                .Append(building.HasBasement ? " basement" : string.Empty)
+                .Append(building.CatacombEntrance ? " catacomb" : string.Empty)
+                .Append('\n');
             foreach (var room in building.Rooms)
             {
                 text.Append("  room ").Append(room.Index.ToString(CultureInfo.InvariantCulture))
