@@ -11,7 +11,7 @@ Goal: solution builds, deterministic core skeleton tested, Godot opens a scene.
 - [x] 3D world model: chunks, transforms
 - [x] Headless sim runner + state hash
 - [x] Player movement system (intent → transform) and third-person camera math
-- [ ] Godot scene: ground, instanced boxes, third-person camera, WASD movement demo
+- [x] Godot scene: ground, instanced boxes, third-person camera, WASD movement demo
 - [ ] "Noche Cero" title screen
 - [ ] Godot headless build job in CI
 - [x] ADRs 0001–0003 accepted

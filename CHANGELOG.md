@@ -32,6 +32,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Rect2` ground-plane geometry and a shared `Hashing.Fnv1a64`.
 - `StateHasher` now covers enums, booleans, strings and integer components.
 - Runner `--town` and `--nav` modes for inspecting a generated town and a route headlessly.
+- Godot project (`src/Game`): `project.godot`, `Main.tscn`, input map and a `GameRoot` that
+  generates the town, owns the fixed-tick `Simulation` and drives the player.
+- `WorldRenderer` draws a `TownPlan` with one `MultiMeshInstance3D` per material, so a 724-building
+  town costs a handful of draw calls.
+- `PlayerController` with two fully playable camera modes (third person and first person, each with
+  its own aim behaviour) and a `V` toggle at any time.
+- `--seed`, `--no-shadows` and `--screenshot` arguments for inspecting the town without a human
+  watching.
 
 ### Changed
 

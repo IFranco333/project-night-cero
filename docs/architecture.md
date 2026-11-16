@@ -95,9 +95,24 @@ behaviour testable when the agents arrive in S3.
 - Checksum FNV-1a over canonical state; migrations are versioned functions; future versions rejected cleanly.
 
 ## Rendering (Godot)
-- Third-person camera by default; first-person aim mode. Camera smoothing; collision-aware spring arm.
-- MultiMesh for props and zombies; merged static meshes per building; visibility ranges for LOD.
-- One directional light with shadow range limited around the camera; night lighting presets.
+The Godot project lives in `src/Game` and is deliberately thin: it reads a `TownPlan` and a
+`Simulation`, and draws them. It contains no gameplay rules.
+
+- `Scenes/GameRoot.cs` generates the town for the seed, spawns it into the simulation, owns the
+  fixed-tick accumulator and drives the player. It is the only place that knows both layers.
+- `Rendering/WorldRenderer.cs` turns the plan into instanced boxes: one `MultiMeshInstance3D` per
+  material (ground, roads, buildings, trees, cars, streetlights, benches, dumpsters). A 724-building
+  town is a handful of draw calls, and swapping boxes for prefab scenes later does not touch the
+  generator.
+- `Player/PlayerController.cs` converts input into a `MoveIntent` and applies the pose from
+  `ThirdPersonRig` to a `Camera3D`. Both camera modes are fully playable: third person walks and
+  aims in third person, first person walks and aims in first person, and `V` switches at any time.
+- The renderer defaults to the **Compatibility** (OpenGL 3.3) backend so it runs on integrated and
+  older GPUs; `forward_plus` is a one-line change in `project.godot` for machines with Vulkan.
+- Shadows are the dominant cost on weak GPUs; `--no-shadows` disables them for inspection runs.
+
+Still to come: camera collision, roof fading when the player is indoors, LOD and chunk streaming
+for the 3 km² target, and prefab meshes replacing the grey boxes.
 
 ## Headless mode
 `NightCero.Runner` is a console harness that boots the simulation without Godot:
