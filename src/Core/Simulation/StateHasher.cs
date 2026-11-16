@@ -34,10 +34,10 @@ public static class StateHasher
         ArgumentNullException.ThrowIfNull(world);
 
         var bytes = Encoding.UTF8.GetBytes(Canonical(world));
-        var hash = Fnv1a64(bytes);
+        var hash = Hashing.Fnv1a64(bytes);
         for (uint id = 1; id <= world.HighestEntityId; id++)
         {
-            hash = Fnv1a64(BitConverter.GetBytes(unchecked(hash ^ (world.IsAlive(new Entity(id)) ? 1UL : 0UL))));
+            hash = Hashing.Fnv1a64(BitConverter.GetBytes(unchecked(hash ^ (world.IsAlive(new Entity(id)) ? 1UL : 0UL))));
         }
 
         return hash;
@@ -97,19 +97,4 @@ public static class StateHasher
 
     private static decimal Quantize(double value) =>
         System.Math.Round((decimal)value, Precision, MidpointRounding.ToEven) + 0m;
-
-    private static ulong Fnv1a64(ReadOnlySpan<byte> bytes)
-    {
-        const ulong offsetBasis = 0xCBF29CE484222325UL;
-        const ulong prime = 0x100000001B3UL;
-
-        var hash = offsetBasis;
-        foreach (var b in bytes)
-        {
-            hash ^= b;
-            hash *= prime;
-        }
-
-        return hash;
-    }
 }
