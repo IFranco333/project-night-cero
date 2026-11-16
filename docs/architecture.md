@@ -100,6 +100,10 @@ The Godot project lives in `src/Game` and is deliberately thin: it reads a `Town
 
 - `Scenes/GameRoot.cs` generates the town for the seed, spawns it into the simulation, owns the
   fixed-tick accumulator and drives the player. It is the only place that knows both layers.
+- `Scenes/TitleScreen.cs` draws the title over the town while the camera orbits; the simulation
+  does not tick until the player starts. `--title` keeps it up for reproducible screenshots.
+- CI builds the Godot project in its own job (`game`): `Godot.NET.Sdk` restores from NuGet, so the
+  C# layer compiles on Linux with no editor and no Godot binary.
 - `Rendering/WorldRenderer.cs` turns the plan into instanced boxes: one `MultiMeshInstance3D` per
   material (ground, roads, road markings, block slabs, park paths, buildings, doors, windows,
   hatches, trees, cars, streetlights, benches, dumpsters). A 654-building town is a handful of draw
